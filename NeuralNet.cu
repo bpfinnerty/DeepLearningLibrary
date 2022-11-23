@@ -4,6 +4,9 @@
 #include<vector>
 #include<math.h>
 #include<stdexcept>
+#include<pybind11/pybind11.h>
+#include<pybind11/numpy.h>
+#include<pybind11/stl.h>
 #include "NeuralNet.h"
 
 
@@ -55,12 +58,12 @@ namespace NeuralNet{
         return ret;
     }
 
-    double MSLOSS(std::vector<double> x,std::vector<double> target){
-        double ret;
-        int size = x.size();
+    // double MSLOSS(std::vector<double> x,std::vector<double> target){
+    //     double ret;
+    //     int size = x.size();
 
-        return ret;
-    }
+    //     return ret;
+    // }
 
     double relu_deriv(double x){
         if (x <=0){
@@ -80,9 +83,9 @@ namespace NeuralNet{
         }
     }
 
-    std::vector<double> Cross_Entropy(std::vector<double> output,std::vector<double> target){
+    // std::vector<double> Cross_Entropy(std::vector<double> output,std::vector<double> target){
 
-    }
+    // }
 
     void backward(std::vector<double> output,std::vector<double> target){
         std::vector<double> errors;
@@ -249,6 +252,22 @@ namespace NeuralNet{
     }
 
 
+}
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(NeuralNet,m){
+  py::class_<NeuralNet>(m,"NeuralNet")
+    .def(py::init<int,int>)
+    .def("normal_distribution_weights",&NeuralNet::normal_distribution_weights)
+    .def("ff",&NeuralNet::ff)
+  
+  m.def("setLearningRate",&setLearningRate);
+  m.def("setInputs",&setInputs);
+  m.def("relu",&relu);
+  m.def("backward",&backward);
+  m.def("leakyRelu",&leakyRelu);
+  m.def("matrix_mul_2d",&matrix_mul_2d);
 }
 
 

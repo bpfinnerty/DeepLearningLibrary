@@ -19,15 +19,22 @@ namespace NeuralNet{
     std::vector<int> sizes;
     std::vector<double*> delta;
     std::vector<double*> deltaBias;
+    
     double learningRate = .01;
     double* firstInputs;
+
     void setInputs(double* x);
     void setLearningRate(double x);
-    std::vector<double> relu(std::vector<double> inputs);
-    double MSLOSS(std::vector<double> inputs,std::vector<double> target);
-    std::vector<double> Cross_Entropy(std::vector<double> inputs,std::vector<double> target);
-    std::vector<double> relu_deriv(std::vector<double> inputs);
-    std::vector<double> dotproduct(std::vector<double> inputs);
+    std::vector<double> relu(std::vector<double> x);
+    double relu_deriv(double x);
+    std::vector<double> leakyRelu(std::vector<double> x);
+    double leakyRelu_deriv(double x);
+    
+    //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
+    //std::vector<double> Cross_Entropy(std::vector<double> inputs,std::vector<double> target);
+    
+    //std::vector<double> dotproduct(std::vector<double> inputs);
+    
     void backward(std::vector<double> x);
     bool gpu_check = false;
 
@@ -40,12 +47,11 @@ class NeuralNet{
         std::vector<double> nodeOutput;
         std::vector<double> deltaList;
         std::vector<double> deltaBias;
-        char activation;
         int inputs;
         int outputs;
 
 
-        NeuralNet(int input, int output, char act): inputs(input) outputs(output) activation(act) {
+        NeuralNet(int input, int output): inputs(input), outputs(output) {
             sizes.push_back(inputs);
             sizes.push_back(outputs);
 
