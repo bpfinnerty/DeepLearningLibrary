@@ -102,7 +102,6 @@ namespace NeuralNet{
                 int numOutputs  =sizes[curLayer*2+1];
 
                 double* weights = net[curLayer*netLay];
-                double* bias = net[curLayer*netLay+1];
                 double* nodeOutput = net[curLayer*netLay+2];
                 double* deltaBias = net[curLayer*netLay+3];
                 double* deltaList = delta[curLayer];
@@ -180,7 +179,7 @@ namespace NeuralNet{
             }
 
             // update gradients
-            for(int currLayer = 0;currLayer < delta.size();++currLayer){
+            for(int currLayer = 0;currLayer < layers;++currLayer){
                 int numInputs = sizes[currLayer*2];
                 int numOutputs  =sizes[currLayer*2+1];
 
@@ -229,7 +228,7 @@ namespace NeuralNet{
 
 
     std::vector<double> NeuralNet::ff(std::vector<double> x){
-        if (x.size() != inputs){
+        if ((int)x.size() != inputs){
             throw std::runtime_error("Mismatched dims in index");
         }
         if(gpu_check){

@@ -19,7 +19,7 @@ namespace NeuralNet{
     std::vector<int> sizes;
     std::vector<double*> delta;
     std::vector<double*> deltaBias;
-    
+
     double learningRate = .01;
     double* firstInputs;
 
@@ -65,17 +65,17 @@ class NeuralNet{
             deltaBias.resize(outputs,0.0);
             delta.push_back(&deltaList);
 
-            net.push_back(&weights);
-            net.push_back(&bias);
-            net.push_back(&nodeOutput);
-            net.push_back(&deltaBias);
+            net.push_back(&weights.data());
+            net.push_back(&bias.data());
+            net.push_back(&nodeOutput.data());
+            net.push_back(&deltaBias.data());
 
         }
 
         void normal_distribution_weights();
 
         std::vector<double> ff(std::vector<double> x);
-}
+};
 
 }
 #endif
