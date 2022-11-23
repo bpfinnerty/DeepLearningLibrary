@@ -6,57 +6,66 @@
 #include<string.h>
 #include<stdlib.h>
 #include<vector>
+#include <iostream>
 #include<math.h>
 #include<stdexcept>
 #include <random>
 
 namespace NeuralNet{
 
+    std::vector<double*> net;
+    int netLay = 4;
+    std::vector<double (*)(double)> activations;
+    std::vector<int> sizes;
+    std::vector<double*> delta;
+    std::vector<double*> deltaBias;
+    double learningRate = .01;
+    double* firstInputs;
+    void setInputs(double* x);
+    void setLearningRate(double x);
     std::vector<double> relu(std::vector<double> inputs);
     double MSLOSS(std::vector<double> inputs,std::vector<double> target);
     std::vector<double> Cross_Entropy(std::vector<double> inputs,std::vector<double> target);
     std::vector<double> relu_deriv(std::vector<double> inputs);
     std::vector<double> dotproduct(std::vector<double> inputs);
+    void backward(std::vector<double> x);
     bool gpu_check = false;
 
-class FeedForward{
+
+class NeuralNet{
     
     public:
         std::vector<double> weights;
         std::vector<double> bias;
         std::vector<double> nodeOutput;
+        std::vector<double> deltaList
+        char activation;
         int inputs;
         int outputs;
 
 
-        FeedForward(int input, int output){
-            inputs = input;
-            outputs = output;
+        NeuralNet(int input, int output, char act): inputs(input) outputs(output) activation(act) {
+            sizes.push_back(inputs);
+            sizes.push_back(outputs);
+
             weights.resize(inputs*outputs);
-            activation.resize(outputs);
-
+            bias.resize(outputs);
+            nodeOutput.resize(outputs);
+            
             normal_distribution_weights();
+            
+            deltaList.resize(inputs*outputs);
+            delta.push_back(&deltaList);
+
+            net.push_back(&weights);
+            net.push_back(&bias);
+            net.push_back(&nodeOutput);
 
         }
 
-        void normal_distribution_weights(){
-            std::random_device rd{};
-            std::mt19937 gen{rd()};
-            std::normal_distribution<double> distribution(.50,2.0);
-            int i = 0;
-            int size = inputs*outputs;
-            while(i< size){
-                double w = distribution(gen);
-                if (w >= 0.0 && w <=1.0){
-                    weights[i] = w;
-                    i++;
-                }
-            }
-            std::cout << "Initialized Weights";
-        }
+        void normal_distribution_weights();
 
         std::vector<double> ff(std::vector<double> x);
-        //std::vector<double> grad(std::vector<double> x);
 }
 
 }
