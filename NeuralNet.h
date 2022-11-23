@@ -38,7 +38,8 @@ class NeuralNet{
         std::vector<double> weights;
         std::vector<double> bias;
         std::vector<double> nodeOutput;
-        std::vector<double> deltaList
+        std::vector<double> deltaList;
+        std::vector<double> deltaBias;
         char activation;
         int inputs;
         int outputs;
@@ -55,11 +56,13 @@ class NeuralNet{
             normal_distribution_weights();
             
             deltaList.resize(inputs*outputs);
+            deltaBias.resize(outputs,0.0);
             delta.push_back(&deltaList);
 
             net.push_back(&weights);
             net.push_back(&bias);
             net.push_back(&nodeOutput);
+            net.push_back(&deltaBias);
 
         }
 
