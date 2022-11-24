@@ -257,7 +257,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(projNet,m){
   py::class_<NeuralNet>(m,"NeuralNet")
-    .def(py::init<int,int>)
+    .def(py::init<int,int>())
     .def("normal_distribution_weights",&NeuralNet::normal_distribution_weights)
     .def("ff",&NeuralNet::ff)
   
