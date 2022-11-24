@@ -260,17 +260,17 @@ namespace Net{
 namespace py = pybind11;
 
 PYBIND11_MODULE(projNet,m){
-  py::class_<NeuralNet>(m,"NeuralNet")
+  py::class_<Net::NeuralNet>(m,"NeuralNet")
     .def(py::init<int,int>)
-    .def("normal_distribution_weights",&NeuralNet::normal_distribution_weights)
-    .def("ff",&NeuralNet::ff)
+    .def("normal_distribution_weights",&Net::NeuralNet::normal_distribution_weights)
+    .def("ff",&Net::NeuralNet::ff)
   
-  m.def("setLearningRate",&setLearningRate);
-  m.def("setInputs",&setInputs);
-  m.def("relu",&relu);
-  m.def("backward",&backward);
-  m.def("leakyRelu",&leakyRelu);
-  m.def("matrix_mul_2d",&matrix_mul_2d);
+  m.def("setLearningRate",&Net::setLearningRate);
+  m.def("setInputs",&Net::setInputs);
+  m.def("relu",&Net::relu);
+  m.def("backward",&Net::backward);
+  m.def("leakyRelu",&Net::leakyRelu);
+  m.def("matrix_mul_2d",&NEt::matrix_mul_2d);
 }
 
 
