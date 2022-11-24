@@ -88,7 +88,7 @@ namespace Net{
 
     void backward(std::vector<double> output,std::vector<double> target){
         std::vector<double> errors;
-        if(gpu_check){
+        if(Net::gpu_check){
 
         }
         else{
@@ -232,7 +232,7 @@ namespace Net{
             throw std::runtime_error("Mismatched dims in index");
         }
         std::vector<double> ret(outputs,0.0);
-        if(gpu_check){
+        if(Net::gpu_check){
 
         }
         else{

@@ -36,7 +36,7 @@ namespace Net{
     //std::vector<double> dotproduct(std::vector<double> inputs);
     
     void backward(std::vector<double> x);
-    bool gpu_check = false;
+    bool Net::gpu_check = false;
 }
 
 class NeuralNet{
@@ -65,7 +65,7 @@ class NeuralNet{
             deltaBias.resize(outputs,0.0);
             Net::delta.push_back(deltaList.data());
 
-            NEt::net.push_back(weights.data());
+            Net::net.push_back(weights.data());
             Net::net.push_back(bias.data());
             Net::net.push_back(nodeOutput.data());
             Net::net.push_back(deltaBias.data());
