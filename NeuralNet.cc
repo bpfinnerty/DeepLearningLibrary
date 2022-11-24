@@ -86,7 +86,7 @@ namespace Net{
 
     // }
 
-    void backward(std::vector<double> output,std::vector<double> target){
+    void backwardStep(std::vector<double> output,std::vector<double> target){
         std::vector<double> errors;
         if(Net::gpu_check){
 
@@ -261,13 +261,12 @@ namespace py = pybind11;
 PYBIND11_MODULE(projNet,m){
   py::class_<NeuralNet>(m,"NeuralNet")
     .def(py::init<int,int>())
-    .def("normal_distribution_weights",NeuralNet::normal_distribution_weights)
     .def("ff",&NeuralNet::ff);
   
   m.def("setLearningRate",&Net::setLearningRate);
   m.def("setInputs",&Net::setInputs);
   m.def("relu",&Net::relu);
-  m.def("backward",&Net::backward);
+  m.def("backwardStep",&Net::backwardStep);
   m.def("leakyRelu",&Net::leakyRelu);
 }
 

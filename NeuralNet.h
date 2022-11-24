@@ -35,7 +35,7 @@ namespace Net{
     
     //std::vector<double> dotproduct(std::vector<double> inputs);
     
-    void backward(std::vector<double> x);
+    void backwardStep(std::vector<double> x);
     bool Net::gpu_check = false;
 }
 
