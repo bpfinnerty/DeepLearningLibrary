@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <cmath>
 #include<vector>
 #include<math.h>
 #include<stdexcept>
@@ -82,9 +83,51 @@ namespace Net{
         }
     }
 
-    // std::vector<double> Cross_Entropy(std::vector<double> output,std::vector<double> target){
+    double crossEntropy(std::vector<double> output,std::vector<double> target){
+        double loss = 0.0;
+        if(output.size() != target.size()){
+            throw std::runtime_error("Mismatched dimensions for Loss");
+        }
 
-    // }
+        for(int i = 0; i<output.size();i++){
+            loss += target[i]*log2(output[i]);
+        }
+
+        return loss*-1;
+    }
+
+    std::vector<double> softMax(double x){
+        sf = true;
+        std::vector<double> ret(x.size(),0.0);
+        total = 0.0;
+        for(int i = 0; i<x.size();++i){
+            total += exp(x[i]);
+        }
+        for(int i = 0; i<x.size();++i){
+            ret[i] = exp(x[i])/total;
+        }
+
+        return ret;
+    }
+
+    double softMax_deriv(std::vector<double> x){
+        std::vector<double> ret(x.size(),0.0);
+        total = 0.0;
+        for(int i = 0; i<x.size();++i){
+            total += exp(x[i]);
+        }
+        for(int i = 0; i<x.size();++i){
+            ret[i] = exp(x[i])/total;
+        }
+
+        return ret;
+    }
+
+
+
+    void zeroGrad(){
+        for(int layer = 0; layer<)
+    }
 
     void backwardStep(std::vector<double> output,std::vector<double> target){
         std::vector<double> errors;
@@ -111,10 +154,15 @@ namespace Net{
                     double* inputList = net[(curLayer-1)*netLay+2];
                     
                     // get errors output node
+                    if(meanLoss){
                     #pragma omp parallel for
-                    for(int i = 0; i <numOutputs; ++i){
-                        errors[i]=output[i]-target[i];
+                        for(int i = 0; i <numOutputs; ++i){
+                            errors[i]=output[i]-target[i];
+                        }
+                    }else{
+                        errors[i]=-1/output[i];
                     }
+
                     // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
                     auto funcPointer = activations[curLayer];
                     #pragma omp parallel for
@@ -175,32 +223,31 @@ namespace Net{
                     }
                 }
                 errors = newErrors;
-            }
+            }  
+        }
+    }
 
-            // update gradients
-            for(int currLayer = 0;currLayer < layers;++currLayer){
-                int numInputs = sizes[currLayer*2];
-                int numOutputs  =sizes[currLayer*2+1];
+    void updateWeights(){
+        int layers = net.size()/netLay;
+        // update gradients
+        for(int currLayer = 0;currLayer < layers;++currLayer){
+            int numInputs = sizes[currLayer*2];
+            int numOutputs  =sizes[currLayer*2+1];
 
-                double* weights = net[currLayer*netLay];
-                double* bias = net[currLayer*netLay+1];
-                double* deltaBias = net[currLayer*netLay+3];
-                double* deltaList = delta[currLayer];
-                
-                #pragma omp parallel for
-                for(int j = 0; j < numOutputs; ++j){
-                    bias[j] -= learningRate*deltaBias[j];
-                    for(int i = 0; i<numInputs;++i){
-                        weights[i*numOutputs+j] -= learningRate*deltaList[i*numOutputs+j];
-                    }
+            double* weights = net[currLayer*netLay];
+            double* bias = net[currLayer*netLay+1];
+            double* deltaBias = net[currLayer*netLay+3];
+            double* deltaList = delta[currLayer];
+            
+            #pragma omp parallel for
+            for(int j = 0; j < numOutputs; ++j){
+                bias[j] -= learningRate*deltaBias[j];
+                for(int i = 0; i<numInputs;++i){
+                    weights[i*numOutputs+j] -= learningRate*deltaList[i*numOutputs+j];
                 }
             }
         }
-
-    }
-
-
-    
+    }   
 }
 
 // Methods for Layer Class
@@ -268,6 +315,9 @@ PYBIND11_MODULE(projNet,m){
   m.def("relu",&Net::relu);
   m.def("backwardStep",&Net::backwardStep);
   m.def("leakyRelu",&Net::leakyRelu);
+  m.def("updateWeights",&Net::updateWeights);
+  m.def("crossEntropy",&Net::crossEntropy);
+  
 }
 
 
