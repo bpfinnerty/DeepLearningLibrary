@@ -36,7 +36,7 @@ namespace Net{
     //std::vector<double> dotproduct(std::vector<double> inputs);
     
     void backwardStep(std::vector<double> x);
-    bool Net::gpu_check = false;
+    bool gpu_check = false;
 }
 
 class NeuralNet{
