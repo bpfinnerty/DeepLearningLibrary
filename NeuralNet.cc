@@ -200,57 +200,59 @@ namespace Net{
     }
 
 
-    // Methods for Layer Class
-    void NeuralNet::normal_distribution_weights(){
-        std::random_device rd{};
-        std::mt19937 gen{rd()};
-        std::normal_distribution<double> distribution(.50,2.0);
-        int i = 0;
-        int size = inputs*outputs;
-        while(i< size){
-            double w = distribution(gen);
-            if (w >= 0.0 && w <=1.0){
-                weights[i] = w;
-                i++;
-            }
+    
+}
+
+// Methods for Layer Class
+void NeuralNet::normal_distribution_weights(){
+    std::random_device rd{};
+    std::mt19937 gen{rd()};
+    std::normal_distribution<double> distribution(.50,2.0);
+    int i = 0;
+    int size = inputs*outputs;
+    while(i< size){
+        double w = distribution(gen);
+        if (w >= 0.0 && w <=1.0){
+            weights[i] = w;
+            i++;
         }
-        int j =0;
-        while(j < 1){
-            double w = distribution(gen);
-            if (w >= 0.0 && w <=1.0){
-                bias[j] = w;
-                j++;
-            }
-        }
-        std::cout << "Initialized Weights";
     }
-
-
-    std::vector<double> NeuralNet::ff(std::vector<double> x){
-        
-        if ((int)x.size() != inputs){
-            throw std::runtime_error("Mismatched dims in index");
+    int j =0;
+    while(j < 1){
+        double w = distribution(gen);
+        if (w >= 0.0 && w <=1.0){
+            bias[j] = w;
+            j++;
         }
-        std::vector<double> ret(outputs,0.0);
-        if(Net::gpu_check){
+    }
+    std::cout << "Initialized Weights";
+}
 
+
+std::vector<double> NeuralNet::ff(std::vector<double> x){
+    
+    if ((int)x.size() != inputs){
+        throw std::runtime_error("Mismatched dims in index");
+    }
+    std::vector<double> ret(outputs,0.0);
+    if(Net::gpu_check){
+        return ret;
+    }
+    else{
+        double* r = ret.data();
+        #pragma omp parallel for
+        for(int j = 0; j<outputs;++j){
+            r[j] = bias[j];
         }
-        else{
-            double* r = ret.data();
-            #pragma omp parallel for
-            for(int j = 0; j<outputs;++j){
-                r[j] = bias[j];
+
+        #pragma omp parallel for reduction(+:r[0:outputs])
+        for(int i = 0; i < inputs; ++i){
+            for(int j = 0; j<outputs; ++j){
+                r[i] += x[i]*weights[i*outputs+j];  
             }
-
-            #pragma omp parallel for reduction(+:r[0:outputs])
-            for(int i = 0; i < inputs; ++i){
-                for(int j = 0; j<outputs; ++j){
-                    r[i] += x[i]*weights[i*outputs+j];  
-                }
-                nodeOutput[i] = r[i];
-            }
-            return ret;
+            nodeOutput[i] = r[i];
         }
+        return ret;
     }
 }
 
@@ -267,7 +269,6 @@ PYBIND11_MODULE(projNet,m){
   m.def("relu",&Net::relu);
   m.def("backward",&Net::backward);
   m.def("leakyRelu",&Net::leakyRelu);
-  m.def("matrix_mul_2d",&NEt::matrix_mul_2d);
 }
 
 
