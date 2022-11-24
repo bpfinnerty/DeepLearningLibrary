@@ -52,8 +52,8 @@ class NeuralNet{
 
 
         NeuralNet(int input, int output): inputs(input), outputs(output) {
-            sizes.push_back(inputs);
-            sizes.push_back(outputs);
+            Net::sizes.push_back(inputs);
+            Net::sizes.push_back(outputs);
 
             weights.resize(inputs*outputs);
             bias.resize(outputs);
@@ -63,12 +63,12 @@ class NeuralNet{
             
             deltaList.resize(inputs*outputs);
             deltaBias.resize(outputs,0.0);
-            delta.push_back(deltaList.data());
+            Net::delta.push_back(deltaList.data());
 
-            net.push_back(weights.data());
-            net.push_back(bias.data());
-            net.push_back(nodeOutput.data());
-            net.push_back(deltaBias.data());
+            NEt::net.push_back(weights.data());
+            Net::net.push_back(bias.data());
+            Net::net.push_back(nodeOutput.data());
+            Net::net.push_back(deltaBias.data());
 
         }
 
