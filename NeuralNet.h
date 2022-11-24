@@ -37,7 +37,7 @@ namespace Net{
     
     void backward(std::vector<double> x);
     bool gpu_check = false;
-
+}
 
 class NeuralNet{
     
@@ -77,5 +77,4 @@ class NeuralNet{
         std::vector<double> ff(std::vector<double> x);
 };
 
-}
 #endif

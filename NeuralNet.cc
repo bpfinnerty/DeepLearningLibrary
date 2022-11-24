@@ -10,7 +10,6 @@
 #include "NeuralNet.h"
 
 
-namespace Net{
 
     // All useful functions
 
@@ -254,16 +253,13 @@ namespace Net{
         }
     }
 
-
-}
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(projNet,m){
-  py::class_<Net::NeuralNet>(m,"NeuralNet")
+  py::class_<NeuralNet>(m,"NeuralNet")
     .def(py::init<int,int>)
-    .def("normal_distribution_weights",&Net::NeuralNet::normal_distribution_weights)
-    .def("ff",&Net::NeuralNet::ff)
+    .def("normal_distribution_weights",&NeuralNet::normal_distribution_weights)
+    .def("ff",&NeuralNet::ff)
   
   m.def("setLearningRate",&Net::setLearningRate);
   m.def("setInputs",&Net::setInputs);
