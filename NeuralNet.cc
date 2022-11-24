@@ -10,7 +10,7 @@
 #include "NeuralNet.h"
 
 
-namespace NeuralNet{
+namespace Net{
 
     // All useful functions
 
@@ -228,25 +228,29 @@ namespace NeuralNet{
 
 
     std::vector<double> NeuralNet::ff(std::vector<double> x){
+        
         if ((int)x.size() != inputs){
             throw std::runtime_error("Mismatched dims in index");
         }
+        std::vector<double> ret(outputs,0.0);
         if(gpu_check){
 
         }
         else{
+            double* r = ret.data();
             #pragma omp parallel for
             for(int j = 0; j<outputs;++j){
-                nodeOutput[j] = bias[j];
+                r[j] = bias[j];
             }
 
-            #pragma omp parallel for reduction(+:nodeOutput[0:outputs])
+            #pragma omp parallel for reduction(+:r[0:outputs])
             for(int i = 0; i < inputs; ++i){
                 for(int j = 0; j<outputs; ++j){
-                    nodeOutput[i] += x[i]*weights[i*outputs+j];  
+                    r[i] += x[i]*weights[i*outputs+j];  
                 }
+                nodeOutput[i] = r[i];
             }
-            return nodeOutput;
+            return ret;
         }
     }
 
@@ -255,7 +259,7 @@ namespace NeuralNet{
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(NeuralNet,m){
+PYBIND11_MODULE(projNet,m){
   py::class_<NeuralNet>(m,"NeuralNet")
     .def(py::init<int,int>)
     .def("normal_distribution_weights",&NeuralNet::normal_distribution_weights)

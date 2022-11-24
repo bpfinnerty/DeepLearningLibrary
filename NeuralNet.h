@@ -11,7 +11,7 @@
 #include<stdexcept>
 #include <random>
 
-namespace NeuralNet{
+namespace Net{
 
     std::vector<double*> net;
     int netLay = 4;
@@ -63,12 +63,12 @@ class NeuralNet{
             
             deltaList.resize(inputs*outputs);
             deltaBias.resize(outputs,0.0);
-            delta.push_back(&deltaList);
+            delta.push_back(deltaList.data());
 
-            net.push_back(&weights.data());
-            net.push_back(&bias.data());
-            net.push_back(&nodeOutput.data());
-            net.push_back(&deltaBias.data());
+            net.push_back(weights.data());
+            net.push_back(bias.data());
+            net.push_back(nodeOutput.data());
+            net.push_back(deltaBias.data());
 
         }
 
