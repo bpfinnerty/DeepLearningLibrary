@@ -10,7 +10,7 @@
 #include "NeuralNet.h"
 
 
-
+namespace Net{
     // All useful functions
 
     void setInputs(double* x){
@@ -252,6 +252,7 @@
             return ret;
         }
     }
+}
 
 namespace py = pybind11;
 
