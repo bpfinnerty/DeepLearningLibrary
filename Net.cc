@@ -18,29 +18,79 @@ namespace Config{
 
 void Net::addLayer(int inputs, int outputs){
     Layer l;
+    std::vector<double> weights(inputs*outputs);
+    std::vector<double> bias(outputs);
+    std::vector<double> nodeOutput(outputs);
 
-    l.weights.resize(inputs*outputs);
-    l.bias.resize(outputs);
-    l.nodeOutput.resize(outputs);
+    l.weights = weights.data();
+    l.bias = bias.data();
+    l.nodeOutput = nodeOutput.data();
     
-    normal_distribution_weights(l.weights.data(),l.bias.data(),inputs,outputs);
+    normal_distribution_weights(l.weights,l.bias,inputs,outputs);
     
-    l.deltaList.resize(inputs*outputs,0.0);
-    l.deltaBias.resize(outputs,0.0);
+    std::vector<double> deltaList(inputs*outputs,0.0);
+    std::vector<double> deltaBias(outputs,0.0);
 
-    l.inputs = inputs;
-    l.outputs = outputs;
+    l.deltaList = deltaList.data();
+    l.deltaBias = deltaBias.data();
+
+    l.inputs = &inputs;
+    l.outputs = &outputs;
     
     //std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
 
-    net.push_back(l);
-    Layer test_l = net.back();
-    //std::cout << "Inputs: " << test_l.inputs << " Outputs: " << test_l.outputs << "\n";
+    net.push_back(&l);
+    Layer* test_l = net.back();
+    std::cout << "Inputs: " << *(test_l->inputs) << " Outputs: " << *(test_l->outputs) << "\n";
+}
+
+void Net::setWeights(std::vector<double> startWeights, int layer){
+    if(layer>=(int)net.size()){
+        throw std::runtime_error("Layer out of bounds");
+    }
+    Layer* l = net[layer];
+    double* weights = l->weights;
+    int inputs = *(l->inputs);
+    int outputs = *(l->outputs);
+    int total = inputs*outputs;
+    if((int)startWeights.size() > total){
+        throw std::runtime_error("Mismatched dimensions for initialize weights");
+    }
+    for(int i = 0; i<(int)startWeights.size();++i){
+        weights[i] = startWeights[i];
+    }
+    for(int i = 0; i<(int)startWeights.size();++i){
+        std::cout << weights[i] << " ,";
+    }
+    std::cout << "\n";
+}
+
+
+void Net::setBias(std::vector<double> startBias, int layer){
+    if(layer>=(int)net.size()){
+        throw std::runtime_error("Layer out of bounds");
+    }
+    Layer* l = net[layer];
+    double* bias = l->bias;
+    int inputs = *(l->inputs);
+    int outputs = *(l->outputs);
+    int total = inputs*outputs;
+    if((int)startBias.size() > total){
+        throw std::runtime_error("Mismatched dimensions for initialize bias");
+    }
+    for(int i = 0; i<(int)startBias.size();++i){
+        bias[i] = startBias[i];
+        std::cout << bias[i] << " ,";
+    }
+    for(int i = 0; i<(int)startBias.size();++i){
+        std::cout << bias[i] << " ,";
+    }
+    std::cout << "\n";
 }
 
 void Net::printDim(int layer){
-    Layer l = net[layer];
-    std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
+    Layer* l = net[layer];
+    std::cout << "Inputs: " << l->inputs << " Outputs: " << *(l->outputs) << "\n";
 }
 
 
@@ -156,19 +206,19 @@ double Net::softMax_deriv(double* x, int focus, int outputLen){
 void Net::zeroGrad(){
     int totalLayer = net.size();
     //std::cout << "Numer of Layers: " << totalLayer << "\n";
-    for(int i = 0; i< totalLayer; ++i){
-        Layer l = net[i];
-        //std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
-    }
+    // for(int i = 0; i< totalLayer; ++i){
+    //     Layer* l = net[i];
+    //     //std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
+    // }
     for(int layer = 0; layer<totalLayer;++layer){
         //std::cout << "Layer: " << layer;
-        Layer l = net[layer];
-        int numInputs = l.inputs;
-        int numOutputs  =l.outputs;
+        Layer* l = net[layer];
+        int numInputs = *(l->inputs);
+        int numOutputs  = *(l->outputs);
 
         //std::cout << "Inputs: " << numInputs << " Outputs: " << numOutputs << "\n";
-        double* d = l.deltaList.data();
-        double* db = l.deltaBias.data();
+        double* d = l->deltaList;
+        double* db = l->deltaBias;
         for(int j = 0; j< numInputs*numOutputs;++j){
             d[j] = 0;
         }
@@ -188,19 +238,19 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
 
     int layers = net.size();
     for(int curLayer = layers-1; curLayer>0; --curLayer){
-        Layer l = net[curLayer];
-        int numInputs = l.inputs;
-        int numOutputs  =l.outputs;
+        Layer* l = net[curLayer];
+        int numInputs = *(l->inputs);
+        int numOutputs  = *(l->outputs);
 
-        double* weights = l.weights.data();
-        double* nodeOutput = l.nodeOutput.data();
-        double* deltaBias = l.deltaBias.data();
-        double* deltaList = l.deltaList.data();
+        double* weights = l->weights;
+        double* nodeOutput = l->nodeOutput;
+        double* deltaBias = l->deltaBias;
+        double* deltaList = l->deltaList;
 
         if(curLayer == layers-1 && layers-1 != 0){
             errors.resize(target.size());
 
-            double* inputList = net[curLayer-1].nodeOutput.data();
+            double* inputList = net[curLayer-1]->nodeOutput;
             
             // get errors output node
             if(meanLoss){
@@ -261,7 +311,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             }
         }
         else{
-            double* inputList = net[curLayer-1].nodeOutput.data();
+            double* inputList = net[curLayer-1]->nodeOutput;
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
             auto funcPointer = activations[curLayer];
             #pragma omp parallel for num_threads(Config::numThreads)
@@ -284,27 +334,67 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             for(int j = 0; j<numOutputs;++j){
                 newErrors[i] += errors[i]*weights[i*numInputs+j];
             }
+            errors[i] = newErrors[i];
         }
-        errors = newErrors;
     }  
     Config::firstInputs = NULL;
+}
+
+void Net::printWeights(int layer){
+    std::cout << "In Print Weights";
+    Layer* l = net[layer];
+    int input = *(l->inputs);
+    int output = *(l->outputs);
+    std::cout << "Inputs: " << *(l->inputs) << " Outputs: " << *(l->outputs) << "\n";
+    double* weights = l->weights;
+    std::cout << "[";
+    for(int i = 0; i< input*output;++i){
+        std::cout << weights[i] << " ,";
+    }
+    std::cout << "]\n";
+}
+
+void Net::printBias(int layer){
+    Layer* l = net[layer];
+    int output = *(l->outputs);
+    double* bias = l->bias;
+    std::cout << "[";
+    for(int i = 0; i< output;++i){
+        std::cout << bias[i] << " ,";
+    }
+    std::cout << "]\n";
+}
+
+void Net::printGrad(){
+    
+    for(int i = 0; i<(int)net.size();++i){
+        Layer* l = net[i];
+        int inputs = *(l->inputs);
+        int outputs = *(l->outputs);
+        int total = inputs*outputs;
+        std::cout << "[";
+        for(int j = 0; j< total;++j){
+            std::cout << l->deltaList[j] << " ,";
+        }
+        std::cout << "]\n";
+    }
 }
 
 void Net::updateWeights(){
     int layers = net.size();
     // update gradients
     for(int currLayer = 0;currLayer < layers;++currLayer){
-        int numInputs = net[currLayer].inputs;
-        int numOutputs  = net[currLayer].outputs;
+        int numInputs = *(net[currLayer]->inputs);
+        int numOutputs  = *(net[currLayer]->outputs);
 
-        double* weights = net[currLayer].weights.data();
-        double* bias = net[currLayer].bias.data();
-        double* deltaBias = net[currLayer].deltaBias.data();
-        double* deltaList =net[currLayer].deltaList.data();
+        double* weights = net[currLayer]->weights;
+        double* bias = net[currLayer]->bias;
+        double* deltaBias = net[currLayer]->deltaBias;
+        double* deltaList =net[currLayer]->deltaList;
         
         #pragma omp parallel for num_threads(Config::numThreads)
         for(int j = 0; j < numOutputs; ++j){
-            bias[j] -= learningRate*deltaBias[j];
+            bias[j] -= (learningRate*deltaBias[j])/totalTrain;
             deltaBias[j] = 0.0;
             for(int i = 0; i<numInputs;++i){
                 weights[i*numOutputs+j] -= (learningRate*deltaList[i*numOutputs+j])/totalTrain;
@@ -316,11 +406,27 @@ void Net::updateWeights(){
 }
 
 
+std::vector<double> Net::Sigmoid(std::vector<double> x){
+    if(activations.size() != net.size()){
+        activations.push_back(&Net::sigmoid_deriv);
+    }
+    std::vector<double> ret(x.size(),0.0);
+    #pragma omp parallel for num_threads(Config::numThreads)
+    for(int i =0; i<(int)x.size();++i){
+        ret[i] = (1.0)/(1.0+exp(-x[i]));
+    }
+    return ret;
+}
+
+double Net::sigmoid_deriv(double x){
+    return x*(1-x);
+}
+
 // Methods for Layer Class
 void Net::normal_distribution_weights(double* weights, double* bias, int inputs, int outputs){
     std::random_device rd{};
     std::mt19937 gen{rd()};
-    std::normal_distribution<double> distribution(.50,2.0);
+    std::normal_distribution<double> distribution(.05,1.0);
     int i = 0;
     int size = inputs*outputs;
     while(i< size){
@@ -331,7 +437,7 @@ void Net::normal_distribution_weights(double* weights, double* bias, int inputs,
         }
     }
     int j =0;
-    while(j < 1){
+    while(j < outputs){
         double w = distribution(gen);
         if (w >= 0.0 && w <=1.0){
             bias[j] = w;
@@ -347,50 +453,52 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
         throw std::runtime_error("Mismatched dims in index");
     }
 
-    Layer l = net[layer];
+    Layer* l = net[layer];
 
-    int inputs = l.inputs;
-    int outputs = l.outputs;
-    double* bias = l.bias.data();
-    double* weights = l.weights.data();
-    double* nodeOutput = l.nodeOutput.data();
+    int inputs = *(l->inputs);
+    int outputs = *(l->outputs);
+    double* bias = l->bias;
+    double* weights = l->weights;
+    double* nodeOutput = l->nodeOutput;
 
     if ((int)x.size() != inputs){
         throw std::runtime_error("Mismatched dims in index");
     }
     else{
-        std::cout << "Input is length " << x.size() << "\n";
+        //std::cout << "Input is length " << x.size() << "\n";
     }
-    std::cout << "Time for feed forward\n";
-    std::cout << "Outputs: " << outputs << "\n";
+    //std::cout << "Time for feed forward\n";
+    //std::cout << "Outputs: " << outputs << "\n";
     std::vector<double> ret(outputs,0.0);
     
-    std::cout << "Check first input\n";
+    //std::cout << "Check first input\n";
     if(Config::firstInputs == NULL){
         Config::firstInputs = x.data();
     }
 
-    std::cout << "Set Bias\n";
+    //std::cout << "Set Bias\n";
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int j = 0; j<outputs;++j){
         ret[j] = bias[j];
     }
 
-    std::cout << "multiply by weights\n";
-    #pragma omp parallel for num_threads(Config::numThreads)
-    for(int i = 0; i < inputs; ++i){
+    double sum = 0.0;
+    //std::cout << "multiply by weights\n";
+    #pragma omp parallel for num_threads(Config::numThreads) private(sum)
+    for(int i = 0; i < outputs; ++i){
        //std::cout << "Starting Node " << i << "\n";
-        for(int j = 0; j<outputs; ++j){
-            #pragma omp critical
-            {
-                ret[i] += x[i]*weights[i*outputs+j];
-            }
-            //std::cout << "Completed weight " << j << "\n";  
+       sum = ret[i];
+       //std::cout << "pre multiply: " << sum << "\n";
+        for(int j = 0; j<inputs; ++j){
+            sum += x[j]*weights[j*outputs+i];
+        //std::cout << "Completed weight " << j << "\n";  
         }
-        
+        //std::cout << "post multiply: " << sum << "\n";
+        ret[i] = sum;
         nodeOutput[i] = ret[i];
+        //std::cout << "post Set: " << ret[i] << "\n";
     }
-    std::cout << "finished multiply\n";
+    //std::cout << "finished multiply\n";
     return ret;    
 }
 
@@ -412,7 +520,13 @@ PYBIND11_MODULE(projNet,m){
     .def("crossEntropy",&Net::crossEntropy)
     .def("zeroGrad",&Net::zeroGrad)
     .def("softMax",&Net::softMax)
+    .def("printWeights",&Net::printWeights)
+    .def("Sigmoid",&Net::Sigmoid)
+    .def("printBias",&Net::printBias)
+    .def("setWeights",&Net::setWeights)
+    .def("setBias",&Net::setBias)
     .def("printDim",&Net::printDim);
+    
 
   m.def("setThreads",&Config::setThreads);
   

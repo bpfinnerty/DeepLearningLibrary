@@ -4,40 +4,49 @@ class modelMLP():
 
     def __init__(self):
         self.neuralNet = projNet.Net()
-        self.neuralNet.addLayer(784,16)
-        self.neuralNet.addLayer(16,16)
-        self.neuralNet.addLayer(16,16)
-        self.neuralNet.addLayer(16,16)
-        self.neuralNet.addLayer(16,10)
+        self.neuralNet.addLayer(784,256)
+        self.neuralNet.addLayer(256,64)
+        self.neuralNet.addLayer(64,10)
         
 
     def forward(self, val):
-        print("First layer")
+        #print("First layer")
         #self.neuralNet.printDim(0)
+        #print(val)
         val = self.neuralNet.ff(val,0)
-        print("Time for Relu")
-        val = self.neuralNet.leakyRelu(val)
+        #print(val)
+        #print("Time for sigmoid")
+        val = self.neuralNet.Sigmoid(val)
+        #print(val)
         
-        print("Second Layer")
+        #print("Second Layer")
         #self.neuralNet.printDim(1)
         val = self.neuralNet.ff(val,1)
-        val = self.neuralNet.leakyRelu(val)
+        #print(val)
+        val = self.neuralNet.Sigmoid(val)
+        #print(val)
         
-        print("Third Layer")
+        #print("Third Layer")
         #self.neuralNet.printDim(2)
-        val = self.neuralNet.ff(val,2)
-        val = self.neuralNet.leakyRelu(val)
+        #val = self.neuralNet.ff(val,2)
+        #print(val)
+        #val = self.neuralNet.Sigmoid(val)
+        #print(val)
         
-        print("Fourth layer")
+        #print("Fourth layer")
         #self.neuralNet.printDim(3)
-        val = self.neuralNet.ff(val,3)
-        val = self.neuralNet.leakyRelu(val)
+        #val = self.neuralNet.ff(val,3)
+        #print(val)
+        #val = self.neuralNet.Sigmoid(val)
+        #print(val)
         
-        print("fifth layer")
+        #print("fifth layer")
         #self.neuralNet.printDim(4)
-        val = self.neuralNet.ff(val,4)
-        print("Time for Soft Max")
+        val = self.neuralNet.ff(val,2)
+        #print("Time for Soft Max")
+        #print(val)
         val = self.neuralNet.softMax(val)
+        #print(val)
         
         return val
     

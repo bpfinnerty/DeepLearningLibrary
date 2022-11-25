@@ -22,13 +22,13 @@ class Net{
     
     public:
         struct Layer{
-            std::vector<double> weights;
-            std::vector<double> bias;
-            std::vector<double> nodeOutput;
-            std::vector<double> deltaList;
-            std::vector<double> deltaBias;
-            int inputs;
-            int outputs;
+            double* weights;
+            double* bias;
+            double* nodeOutput;
+            double* deltaList;
+            double* deltaBias;
+            int* inputs;
+            int* outputs;
         };
 
 
@@ -44,6 +44,8 @@ class Net{
         // }
 
         void normal_distribution_weights(double* weights, double* bias, int inputs, int outputs);
+        void setWeights(std::vector<double> startWeights, int layer);
+        void setBias(std::vector<double> startBias, int layer);
 
         std::vector<double> ff(std::vector<double> x, int layer);
         int getInputs();
@@ -51,7 +53,7 @@ class Net{
 
 
 
-        std::vector<Layer> net;
+        std::vector<Layer*> net;
         std::vector<double (Net::*)(double)> activations;
 
         void addLayer(int input, int output);
@@ -65,6 +67,11 @@ class Net{
         double relu_deriv(double x);
         std::vector<double> leakyRelu(std::vector<double> x);
         double leakyRelu_deriv(double x);
+        std::vector<double> Sigmoid(std::vector<double> x);
+        double sigmoid_deriv(double x);
+
+        void printBias(int layer);
+        void printGrad();
         
         //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
         double crossEntropy(std::vector<double> output,std::vector<double> target);
@@ -79,6 +86,7 @@ class Net{
         void updateWeights();
         void zeroGrad();
 
+        void printWeights(int layer);
         void printDim(int layer);
 
         bool gpu_check = false;
