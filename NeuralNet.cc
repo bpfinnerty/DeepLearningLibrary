@@ -103,10 +103,11 @@ namespace Net{
         softBool = true;
         std::vector<double> ret(x.size(),0.0);
         double total = 0.0;
-        for(int i = 0; i<x.size();++i){
+        int s = x.size();
+        for(int i = 0; i<s;++i){
             total += exp(x[i]);
         }
-        for(int i = 0; i<x.size();++i){
+        for(int i = 0; i<s;++i){
             ret[i] = exp(x[i])/total;
         }
 
