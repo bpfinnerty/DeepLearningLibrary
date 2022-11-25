@@ -17,14 +17,16 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     
     
     for e in range(0,epoch):
-        shuffled = train_df.sample(frac=1)
+        shuffled = train_df.sample(frac=.1)
         truth = shuffled.iloc[:,0].to_numpy()
         train = shuffled.iloc[:,1:].to_numpy()
         encoded_truth = oneHotEncode(truth)
         max_examples = train.truth
         index = 0
+        avgLoss = 0
         while index < max_examples:
             
+            projNet.zeroGrad()
             counter = 0
             while counter < batch_size:
                 if counter >= max_examples:
@@ -32,11 +34,12 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                 
                 predictions = model.forward(train[index])
                 loss = projNet.crossEntropy(predictions, encoded_truth[index])
+                avgLoss += loss
                 projNet.backwardStep(predictions,encoded_truth[index])
-            
+            print("finished batch")
             projNet.updateWeights()
-            
-        projNet.zeroGrad()
+        print("Avg Loss: " + str(avgLoss/max_examples) + "for epoch: " + str(e))    
+        
         
         
     
