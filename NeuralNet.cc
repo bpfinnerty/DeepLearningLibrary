@@ -342,7 +342,7 @@ std::vector<double> NeuralNet::ff(std::vector<double> x){
             r[j] = bias[j];
         }
 
-        std::cout < " multiply by weights\n"
+        std::cout << "multiply by weights\n"
         #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(Net::numThreads)
         for(int i = 0; i < inputs; ++i){
             for(int j = 0; j<outputs; ++j){
