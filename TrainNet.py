@@ -25,7 +25,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         shuffled = train_df.sample(frac=.1)
         truth = shuffled.iloc[:,0].to_numpy()
         train = shuffled.iloc[:,1:].to_numpy()
-        encoded_truth = oneHotEncode(truth)
+        encoded_truth = oneHotEncode(truth,10)
         
         
         max_examples = train.size
