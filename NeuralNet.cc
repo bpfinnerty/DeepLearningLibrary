@@ -154,6 +154,7 @@ namespace Net{
             }
         }
         std::cout << "Finised zero grad\n";
+        std::cout << "Does it fail after print\n";
     }
 
     void backwardStep(std::vector<double> output,std::vector<double> target){
@@ -336,13 +337,13 @@ std::vector<double> NeuralNet::ff(std::vector<double> x){
         std::cout << "Get data\n";
         double* r = ret.data();
 
-        std::cout < "Set Bias\n"
+        std::cout << "Set Bias\n";
         #pragma omp parallel for num_threads(Net::numThreads)
         for(int j = 0; j<outputs;++j){
             r[j] = bias[j];
         }
 
-        std::cout << "multiply by weights\n"
+        std::cout << "multiply by weights\n";
         #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(Net::numThreads)
         for(int i = 0; i < inputs; ++i){
             for(int j = 0; j<outputs; ++j){
