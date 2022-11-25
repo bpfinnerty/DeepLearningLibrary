@@ -19,7 +19,6 @@ namespace Net{
     std::vector<int> sizes;
     std::vector<double*> delta;
     std::vector<double*> deltaBias;
-    double (*)(std::vector<double>,std::vector<double>) lossFunc = NULL;
 
     double learningRate = .01;
     double* firstInputs;
@@ -32,8 +31,8 @@ namespace Net{
     double leakyRelu_deriv(double x);
     
     //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
-    std::vector<double> crossEntropy(std::vector<double> output,std::vector<double> target);
-    std::vector<double> crossEntropy_deriv(std::vector<double> output,std::vector<double> target);
+    double crossEntropy(std::vector<double> output,std::vector<double> target);
+    //std::vector<double> crossEntropy_deriv(std::vector<double> output,std::vector<double> target);
     std::vector<double> softMax(std::vector<double> x);
 
     
@@ -44,6 +43,7 @@ namespace Net{
     void zeroGrad();
     bool gpu_check = false;
     bool softBool = false;
+    bool meanLoss = false;
 }
 
 class NeuralNet{

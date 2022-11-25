@@ -88,15 +88,15 @@ namespace Net{
         if(output.size() != target.size()){
             throw std::runtime_error("Mismatched dimensions for Loss");
         }
-
-        for(int i = 0; i<output.size();i++){
+        int s = output.size();
+        for(int i = 0; i<s;i++){
             loss += target[i]*log2(output[i]);
         }
 
         return loss*-1;
     }
 
-    std::vector<double> softMax(double x){
+    std::vector<double> softMax(std::vector<double> x){
         if(activations.size() != net.size()/netLay){
             activations.push_back(&leakyRelu_deriv);
         }
@@ -175,7 +175,9 @@ namespace Net{
                             errors[i]=output[i]-target[i];
                         }
                     }else{
-                        errors[i]=-1.0/output[i];
+                        for(int i = 0; i < numOutputs;++i){
+                            errors[i]=-1.0/output[i];
+                        }
                     }
 
                     // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
