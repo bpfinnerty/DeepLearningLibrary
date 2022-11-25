@@ -18,6 +18,10 @@ namespace Net{
         firstInputs = x;
     }
 
+    void setThreads(int t){
+        numThreads = t;
+    }
+
     void setLearningRate(double x){
         learningRate = x;
     }
@@ -32,7 +36,7 @@ namespace Net{
 
         }
         else{
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(numThreads)
             for(int i = 0; i<size;++i){
                 ret[i] = x[i] > 0 ? x[i] : 0;
             }
@@ -50,7 +54,7 @@ namespace Net{
 
         }
         else{
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(numThreads)
             for(int i = 0; i<size;++i){
                 ret[i] = x[i] > 0 ? x[i] : x[i]*0.01;
             }
@@ -114,9 +118,9 @@ namespace Net{
         return ret;
     }
 
-    double softMax_deriv(std::vector<double> x, int focus, int outputLen){
+    double softMax_deriv(double* x, int focus, int outputLen){
         double ret = 0.0;
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(numThreads)
         for(int i = 0; i<outputLen;++i){
             if(i == focus){
                 ret += x[focus] * (1-x[focus]);
@@ -171,7 +175,7 @@ namespace Net{
                     
                     // get errors output node
                     if(meanLoss){
-                    #pragma omp parallel for
+                    #pragma omp parallel for num_threads(numThreads)
                         for(int i = 0; i <numOutputs; ++i){
                             errors[i]=output[i]-target[i];
                         }
@@ -185,18 +189,18 @@ namespace Net{
                     if(softBool){
                         for(int i = 0; i<numOutputs;++i){
                             // error * derivative of activation
-                            errors[i] *= softMax_deriv(nodeOutput[i],i,numOutputs);
+                            errors[i] *= softMax_deriv(nodeOutput,i,numOutputs);
                         }
                     }else{
                         
                         auto funcPointer = activations[curLayer];
-                        #pragma omp parallel for
+                        #pragma omp parallel for num_threads(numThreads)
                         for(int i = 0; i<numOutputs;++i){
                             errors[i] *= funcPointer(nodeOutput[i]);
                         }
                     }
 
-                    #pragma omp parallel for
+                    #pragma omp parallel for num_threads(numThreads)
                     for(int i = 0; i<numOutputs; ++i){
                         
                         
@@ -213,7 +217,7 @@ namespace Net{
 
                     // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
                     auto funcPointer = activations[curLayer];
-                    #pragma omp parallel for
+                    #pragma omp parallel for num_threads(numThreads)
                     for(int i = 0; i<numOutputs; ++i){
                         // error * derivative of activation
                         errors[i] *= (funcPointer(nodeOutput[i]));
@@ -231,7 +235,7 @@ namespace Net{
                     double* inputList = net[(curLayer-1)*netLay+2];
                     // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
                     auto funcPointer = activations[curLayer];
-                    #pragma omp parallel for
+                    #pragma omp parallel for num_threads(numThreads)
                     for(int i = 0; i<numOutputs; ++i){
                         // error * derivative of activation
                         errors[i] *= (funcPointer(nodeOutput[i]));
@@ -269,7 +273,7 @@ namespace Net{
             double* deltaBias = net[currLayer*netLay+3];
             double* deltaList = delta[currLayer];
             
-            #pragma omp parallel for
+            #pragma omp parallel for num_threads(numThreads)
             for(int j = 0; j < numOutputs; ++j){
                 bias[j] -= learningRate*deltaBias[j];
                 for(int i = 0; i<numInputs;++i){
@@ -317,12 +321,12 @@ std::vector<double> NeuralNet::ff(std::vector<double> x){
     }
     else{
         double* r = ret.data();
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(numThreads)
         for(int j = 0; j<outputs;++j){
             r[j] = bias[j];
         }
 
-        #pragma omp parallel for reduction(+:r[0:outputs])
+        #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(numThreads)
         for(int i = 0; i < inputs; ++i){
             for(int j = 0; j<outputs; ++j){
                 r[i] += x[i]*weights[i*outputs+j];  

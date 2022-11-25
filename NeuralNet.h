@@ -29,6 +29,8 @@ namespace Net{
     double relu_deriv(double x);
     std::vector<double> leakyRelu(std::vector<double> x);
     double leakyRelu_deriv(double x);
+
+    int numThreads = 1;
     
     //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
     double crossEntropy(std::vector<double> output,std::vector<double> target);
