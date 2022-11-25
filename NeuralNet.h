@@ -71,7 +71,7 @@ class NeuralNet{
             
             normal_distribution_weights();
             
-            deltaList.resize(inputs*outputs);
+            deltaList.resize(inputs*outputs,0.0);
             deltaBias.resize(outputs,0.0);
             Net::delta.push_back(deltaList.data());
 

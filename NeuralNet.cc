@@ -285,8 +285,10 @@ namespace Net{
             #pragma omp parallel for num_threads(numThreads)
             for(int j = 0; j < numOutputs; ++j){
                 bias[j] -= learningRate*deltaBias[j];
+                deltaBias[j] = 0.0;
                 for(int i = 0; i<numInputs;++i){
                     weights[i*numOutputs+j] -= (learningRate*deltaList[i*numOutputs+j])/totalTrain;
+                    deltaList[i*numOutputs+j] = 0.0;
                 }
             }
         }
