@@ -137,10 +137,12 @@ namespace Net{
 
     void zeroGrad(){
         int totalLayer = delta.size();
+        std::cout << "Numer of Layers: " + totalLayer + "\n";
         for(int layer = 0; layer<totalLayer;++layer){
             std::cout << "Layer: " + layer;
             int i = sizes[layer];
             int o = sizes[layer];
+            std::cout << "Inputs: " + i + " Outputs: " + o + "\n";
             double* d = delta[layer];
             double* db = net[layer*netLay+3];
             for(int j = 0; j< o*i;++j){
@@ -150,7 +152,7 @@ namespace Net{
                 db[j] = 0;
             }
         }
-        std::cout << "Finised zero grad";
+        std::cout << "Finised zero grad\n";
     }
 
     void backwardStep(std::vector<double> output,std::vector<double> target){
