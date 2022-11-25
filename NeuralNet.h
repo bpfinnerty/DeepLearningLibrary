@@ -43,7 +43,7 @@ namespace Net{
     void updateWeights();
     void zeroGrad();
     bool gpu_check = false;
-    bool sf = false;
+    bool softBool = false;
 }
 
 class NeuralNet{

@@ -97,9 +97,12 @@ namespace Net{
     }
 
     std::vector<double> softMax(double x){
-        sf = true;
+        if(activations.size() != net.size()/netLay){
+            activations.push_back(&leakyRelu_deriv);
+        }
+        softBool = true;
         std::vector<double> ret(x.size(),0.0);
-        total = 0.0;
+        double total = 0.0;
         for(int i = 0; i<x.size();++i){
             total += exp(x[i]);
         }
@@ -110,14 +113,16 @@ namespace Net{
         return ret;
     }
 
-    double softMax_deriv(std::vector<double> x){
-        std::vector<double> ret(x.size(),0.0);
-        total = 0.0;
-        for(int i = 0; i<x.size();++i){
-            total += exp(x[i]);
-        }
-        for(int i = 0; i<x.size();++i){
-            ret[i] = exp(x[i])/total;
+    double softMax_deriv(std::vector<double> x, int focus, int outputLen){
+        double ret = 0.0;
+        #pragma omp parallel for
+        for(int i = 0; i<outputLen;++i){
+            if(i == focus){
+                ret += x[focus] * (1-x[focus]);
+            }
+            else{
+                ret += -x[focus] * x[i];
+            }
         }
 
         return ret;
@@ -126,7 +131,19 @@ namespace Net{
 
 
     void zeroGrad(){
-        for(int layer = 0; layer<)
+        int totalLayer = delta.size();
+        for(int layer = 0; layer<totalLayer;++layer){
+            int i = sizes[layer];
+            int o = sizes[layer];
+            double* d = delta[layer];
+            double* db = deltaBias[layer];
+            for(int j = 0; j< o*i;++j){
+                d[j] = 0;
+            }
+            for(int j = 0; j< o;++j){
+                db[j] = 0;
+            }
+        }
     }
 
     void backwardStep(std::vector<double> output,std::vector<double> target){
@@ -135,8 +152,6 @@ namespace Net{
 
         }
         else{
-            
-
             int layers = net.size()/netLay;
             for(int curLayer = layers-1; curLayer>0; --curLayer){
                 
@@ -160,15 +175,27 @@ namespace Net{
                             errors[i]=output[i]-target[i];
                         }
                     }else{
-                        errors[i]=-1/output[i];
+                        errors[i]=-1.0/output[i];
                     }
 
                     // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
-                    auto funcPointer = activations[curLayer];
+                    if(softBool){
+                        for(int i = 0; i<numOutputs;++i){
+                            // error * derivative of activation
+                            errors[i] *= softMax_deriv(nodeOutput[i],i,numOutputs);
+                        }
+                    }else{
+                        
+                        auto funcPointer = activations[curLayer];
+                        #pragma omp parallel for
+                        for(int i = 0; i<numOutputs;++i){
+                            errors[i] *= funcPointer(nodeOutput[i]);
+                        }
+                    }
+
                     #pragma omp parallel for
                     for(int i = 0; i<numOutputs; ++i){
-                        // error * derivative of activation
-                        errors[i] *= (funcPointer(nodeOutput[i]));
+                        
                         
                         // get gradient for delta term.
                         deltaBias[i] += errors[i];
