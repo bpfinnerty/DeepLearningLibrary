@@ -157,6 +157,8 @@ namespace Net{
 
         }
         else{
+            totalTrain++;
+
             int layers = net.size()/netLay;
             for(int curLayer = layers-1; curLayer>0; --curLayer){
                 
@@ -259,6 +261,7 @@ namespace Net{
                 errors = newErrors;
             }  
         }
+        firstInputs = NULL;
     }
 
     void updateWeights(){
@@ -277,10 +280,11 @@ namespace Net{
             for(int j = 0; j < numOutputs; ++j){
                 bias[j] -= learningRate*deltaBias[j];
                 for(int i = 0; i<numInputs;++i){
-                    weights[i*numOutputs+j] -= learningRate*deltaList[i*numOutputs+j];
+                    weights[i*numOutputs+j] -= (learningRate*deltaList[i*numOutputs+j])/totalTrain;
                 }
             }
         }
+        totalTrain = 0;
     }   
 }
 
@@ -320,13 +324,16 @@ std::vector<double> NeuralNet::ff(std::vector<double> x){
         return ret;
     }
     else{
+        if(Net::firstInputs == NULL){
+            Net::firstInputs = x.data();
+        }
         double* r = ret.data();
-        #pragma omp parallel for num_threads(numThreads)
+        #pragma omp parallel for num_threads(Net::numThreads)
         for(int j = 0; j<outputs;++j){
             r[j] = bias[j];
         }
 
-        #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(numThreads)
+        #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(Net::numThreads)
         for(int i = 0; i < inputs; ++i){
             for(int j = 0; j<outputs; ++j){
                 r[i] += x[i]*weights[i*outputs+j];  
@@ -351,6 +358,8 @@ PYBIND11_MODULE(projNet,m){
   m.def("leakyRelu",&Net::leakyRelu);
   m.def("updateWeights",&Net::updateWeights);
   m.def("crossEntropy",&Net::crossEntropy);
+  m.def("setThreads",&Net::setThreads);
+  m.def("zeroGrad",&Net::zeroGrad);
   
 }
 

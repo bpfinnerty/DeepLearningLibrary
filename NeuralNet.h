@@ -21,7 +21,7 @@ namespace Net{
     std::vector<double*> deltaBias;
 
     double learningRate = .01;
-    double* firstInputs;
+    double* firstInputs = NULL;
 
     void setInputs(double* x);
     void setLearningRate(double x);
@@ -43,9 +43,11 @@ namespace Net{
     void backwardStep(std::vector<double> output,std::vector<double> target);
     void updateWeights();
     void zeroGrad();
+
     bool gpu_check = false;
     bool softBool = false;
     bool meanLoss = false;
+    int totalTrain = 0;
 }
 
 class NeuralNet{
