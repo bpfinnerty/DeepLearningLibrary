@@ -1,4 +1,5 @@
 mnist_test.csv
 mnist_train.csv
 projNet.cpython-38-x86_64-linux-gnu.so
-.nfs000000000403fa1d00000391
+.nf*
+__pycache__/*

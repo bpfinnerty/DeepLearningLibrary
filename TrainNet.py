@@ -15,7 +15,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     train_df = pd.read_csv(trainDataPath,header=None,skiprows=1)
     print("opened data")
     
-    projNet.setLearningRate(learningRate)
+    model.neuralNet.setLearningRate(learningRate)
     projNet.setThreads(numThreads)
     print("Set initial values")
     
@@ -35,7 +35,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         while index < max_examples:
             print(index)
 
-            projNet.zeroGrad()
+            model.neuralNet.zeroGrad()
             print("After grad")
             counter = 0
             while counter < batch_size:
@@ -43,13 +43,13 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                     break
                 print(counter)
                 predictions = model.forward(train[index])
-                loss = projNet.crossEntropy(predictions, encoded_truth[index])
+                loss = model.neuralNet.crossEntropy(predictions, encoded_truth[index])
                 avgLoss += loss
-                projNet.backwardStep(predictions,encoded_truth[index])
+                model.neuralNet.backwardStep(predictions,encoded_truth[index])
                 index+=1
                 counter+=1
             print("finished batch")
-            projNet.updateWeights()
+            model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + "for epoch: " + str(e))    
         
         
@@ -60,7 +60,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 if __name__ == "__main__":
     
     learningRate = 0.01
-    numThreads = 8
+    numThreads = 1
     epoch = 30
     batch = 16
     
