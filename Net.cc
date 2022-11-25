@@ -18,7 +18,10 @@ namespace Config{
 
 void Net::addLayer(int input, int output){
     Layer l = Layer(input,output);
+    
     net.push_back(&l);
+    Layer* test_l = net.back();
+    std::cout << "Inputs: " << test_l->inputs << " Outputs: " << test_l->outputs << "\n";
 }
 
 
@@ -134,6 +137,10 @@ double Net::softMax_deriv(double* x, int focus, int outputLen){
 void Net::zeroGrad(){
     int totalLayer = net.size();
     std::cout << "Numer of Layers: " << totalLayer << "\n";
+    for(int i = 0; i< totalLayer; ++i){
+        Layer* l = net[i];
+        std::cout << "Inputs: " << l->inputs << " Outputs: " << l->outputs << "\n";
+    }
     for(int layer = 0; layer<totalLayer;++layer){
         std::cout << "Layer: " << layer;
         Layer* l = net[layer];
