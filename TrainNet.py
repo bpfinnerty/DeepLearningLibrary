@@ -18,7 +18,11 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     model.neuralNet.setLearningRate(learningRate)
     projNet.setThreads(numThreads)
     
-    #model.getNet().printDim(0)
+    model.getNet().printDim(0)
+    model.getNet().printDim(1)
+    model.getNet().printDim(2)
+    model.getNet().printDim(3)
+    model.getNet().printDim(4)
     print("Set initial values")
     
     for e in range(0,epoch):
@@ -45,9 +49,9 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                     break
                 print(counter)
                 predictions = model.forward(train[index])
-                loss = model.neuralNet.crossEntropy(predictions, encoded_truth[index])
+                loss = model.neuralNet.crossEntropy(predictions, encoded_truth)
                 avgLoss += loss
-                model.neuralNet.backwardStep(predictions,encoded_truth[index])
+                model.neuralNet.backwardStep(predictions,encoded_truth)
                 index+=1
                 counter+=1
             print("finished batch")

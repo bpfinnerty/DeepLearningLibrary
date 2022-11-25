@@ -31,11 +31,11 @@ void Net::addLayer(int inputs, int outputs){
     l.inputs = inputs;
     l.outputs = outputs;
     
-    std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
+    //std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
 
     net.push_back(l);
     Layer test_l = net.back();
-    std::cout << "Inputs: " << test_l.inputs << " Outputs: " << test_l.outputs << "\n";
+    //std::cout << "Inputs: " << test_l.inputs << " Outputs: " << test_l.outputs << "\n";
 }
 
 void Net::printDim(int layer){
@@ -359,23 +359,24 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
         throw std::runtime_error("Mismatched dims in index");
     }
     else{
-        //std::cout << "Input is length " << x.size() << "\n";
+        std::cout << "Input is length " << x.size() << "\n";
     }
-    //std::cout << "Time for feed forward\n";
+    std::cout << "Time for feed forward\n";
+    std::cout << "Outputs: " << outputs << "\n";
     std::vector<double> ret(outputs,0.0);
     
-    //std::cout << "Check first input\n";
+    std::cout << "Check first input\n";
     if(Config::firstInputs == NULL){
         Config::firstInputs = x.data();
     }
 
-    //std::cout << "Set Bias\n";
+    std::cout << "Set Bias\n";
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int j = 0; j<outputs;++j){
         ret[j] = bias[j];
     }
 
-    //std::cout << "multiply by weights\n";
+    std::cout << "multiply by weights\n";
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int i = 0; i < inputs; ++i){
        //std::cout << "Starting Node " << i << "\n";
@@ -410,7 +411,8 @@ PYBIND11_MODULE(projNet,m){
     .def("updateWeights",&Net::updateWeights)
     .def("crossEntropy",&Net::crossEntropy)
     .def("zeroGrad",&Net::zeroGrad)
-    .def("Net::printDim",&Net::printDim);
+    .def("softMax",&Net::softMax)
+    .def("printDim",&Net::printDim);
 
   m.def("setThreads",&Config::setThreads);
   

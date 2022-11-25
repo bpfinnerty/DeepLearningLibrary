@@ -4,10 +4,10 @@ class modelMLP():
 
     def __init__(self):
         self.neuralNet = projNet.Net()
-        self.neuralNet.addLayer(784,128)
-        self.neuralNet.addLayer(128,64)
-        self.neuralNet.addLayer(64,32)
-        self.neuralNet.addLayer(32,16)
+        self.neuralNet.addLayer(784,16)
+        self.neuralNet.addLayer(16,16)
+        self.neuralNet.addLayer(16,16)
+        self.neuralNet.addLayer(16,16)
         self.neuralNet.addLayer(16,10)
         
 
