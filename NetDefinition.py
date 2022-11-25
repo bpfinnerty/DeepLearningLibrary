@@ -12,11 +12,19 @@ class modelMLP():
         
 
     def forward(self, val):
-        
+        print("First layer")
         val = projNet.leakyRelu(self.inputLayer.ff(val))
+        
+        print("Second Layer")
         val = projNet.leakyRelu(self.h1.ff(val))
+        
+        print("Third Layer")
         val = projNet.leakyRelu(self.h2.ff(val))
+        
+        print("Fourth layer")
         val = projNet.leakyRelu(self.h3.ff(val))
+        
+        print("fifth layer")
         val = projNet.softMax(self.outputLayer.ff(val))
         
         return val

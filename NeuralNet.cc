@@ -48,6 +48,7 @@ namespace Net{
         if(activations.size() != net.size()/netLay){
             activations.push_back(&leakyRelu_deriv);
         }
+        std::cout << "Time for leaky Relu";
         int size = x.size();
         std::vector<double> ret(size);
         if(gpu_check){
@@ -328,15 +329,20 @@ std::vector<double> NeuralNet::ff(std::vector<double> x){
         return ret;
     }
     else{
+        std::cout << "Check first input\n";
         if(Net::firstInputs == NULL){
             Net::firstInputs = x.data();
         }
+        std::cout << "Get data\n";
         double* r = ret.data();
+
+        std::cout < "Set Bias\n"
         #pragma omp parallel for num_threads(Net::numThreads)
         for(int j = 0; j<outputs;++j){
             r[j] = bias[j];
         }
 
+        std::cout < " multiply by weights\n"
         #pragma omp parallel for reduction(+:r[0:outputs]) num_threads(Net::numThreads)
         for(int i = 0; i < inputs; ++i){
             for(int j = 0; j<outputs; ++j){
