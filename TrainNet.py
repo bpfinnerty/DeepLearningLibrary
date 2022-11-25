@@ -34,6 +34,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         print("ready for loop")
         while index < max_examples:
             print(index)
+            #first seg fault
             projNet.zeroGrad()
             counter = 0
             while counter < batch_size:

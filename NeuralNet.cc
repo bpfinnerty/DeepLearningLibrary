@@ -138,10 +138,11 @@ namespace Net{
     void zeroGrad(){
         int totalLayer = delta.size();
         for(int layer = 0; layer<totalLayer;++layer){
+            std::cout << "Layer: " + layer;
             int i = sizes[layer];
             int o = sizes[layer];
             double* d = delta[layer];
-            double* db = deltaBias[layer];
+            double* db = net[layer*netLay+3];
             for(int j = 0; j< o*i;++j){
                 d[j] = 0;
             }
@@ -149,6 +150,7 @@ namespace Net{
                 db[j] = 0;
             }
         }
+        std::cout << "Finised zero grad";
     }
 
     void backwardStep(std::vector<double> output,std::vector<double> target){
@@ -310,7 +312,7 @@ void NeuralNet::normal_distribution_weights(){
             j++;
         }
     }
-    //std::cout << "Initialized Weights";
+    //std::f << "Initialized Weights";
 }
 
 

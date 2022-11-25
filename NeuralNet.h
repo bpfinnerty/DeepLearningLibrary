@@ -18,7 +18,6 @@ namespace Net{
     std::vector<double (*)(double)> activations;
     std::vector<int> sizes;
     std::vector<double*> delta;
-    std::vector<double*> deltaBias;
 
     double learningRate = .01;
     double* firstInputs = NULL;
