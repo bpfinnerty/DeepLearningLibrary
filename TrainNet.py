@@ -1,6 +1,6 @@
 import pandas as pd
 import projNet
-import numpy
+import numpy as np
 from NetDefinition import *
 
 

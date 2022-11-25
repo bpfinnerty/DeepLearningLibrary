@@ -310,7 +310,7 @@ void NeuralNet::normal_distribution_weights(){
             j++;
         }
     }
-    std::cout << "Initialized Weights";
+    //std::cout << "Initialized Weights";
 }
 
 
