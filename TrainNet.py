@@ -17,6 +17,8 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     
     model.neuralNet.setLearningRate(learningRate)
     projNet.setThreads(numThreads)
+    
+    #model.getNet().printDim(0)
     print("Set initial values")
     
     for e in range(0,epoch):

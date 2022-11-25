@@ -16,12 +16,31 @@ namespace Config{
     }
 }
 
-void Net::addLayer(int input, int output){
-    Layer l = Layer(input,output);
+void Net::addLayer(int inputs, int outputs){
+    Layer l;
+
+    l.weights.resize(inputs*outputs);
+    l.bias.resize(outputs);
+    l.nodeOutput.resize(outputs);
     
-    net.push_back(&l);
-    Layer* test_l = net.back();
-    std::cout << "Inputs: " << test_l->inputs << " Outputs: " << test_l->outputs << "\n";
+    normal_distribution_weights(l.weights.data(),l.bias.data(),inputs,outputs);
+    
+    l.deltaList.resize(inputs*outputs,0.0);
+    l.deltaBias.resize(outputs,0.0);
+
+    l.inputs = inputs;
+    l.outputs = outputs;
+    
+    std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
+
+    net.push_back(l);
+    Layer test_l = net.back();
+    std::cout << "Inputs: " << test_l.inputs << " Outputs: " << test_l.outputs << "\n";
+}
+
+void Net::printDim(int layer){
+    Layer l = net[layer];
+    std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
 }
 
 
@@ -45,7 +64,7 @@ std::vector<double> Net::relu(std::vector<double> x){
 }
 
 std::vector<double> Net::leakyRelu(std::vector<double> x){
-    std::cout << "Time for leaky Relu";
+    //std::cout << "Time for leaky Relu\n";
     if(activations.size() != net.size()){
         activations.push_back(&Net::leakyRelu_deriv);
     }
@@ -136,20 +155,20 @@ double Net::softMax_deriv(double* x, int focus, int outputLen){
 
 void Net::zeroGrad(){
     int totalLayer = net.size();
-    std::cout << "Numer of Layers: " << totalLayer << "\n";
+    //std::cout << "Numer of Layers: " << totalLayer << "\n";
     for(int i = 0; i< totalLayer; ++i){
-        Layer* l = net[i];
-        std::cout << "Inputs: " << l->inputs << " Outputs: " << l->outputs << "\n";
+        Layer l = net[i];
+        //std::cout << "Inputs: " << l.inputs << " Outputs: " << l.outputs << "\n";
     }
     for(int layer = 0; layer<totalLayer;++layer){
-        std::cout << "Layer: " << layer;
-        Layer* l = net[layer];
-        int numInputs = l->inputs;
-        int numOutputs  =l->outputs;
+        //std::cout << "Layer: " << layer;
+        Layer l = net[layer];
+        int numInputs = l.inputs;
+        int numOutputs  =l.outputs;
 
-        std::cout << "Inputs: " << numInputs << " Outputs: " << numOutputs << "\n";
-        double* d = l->deltaList.data();
-        double* db = l->deltaBias.data();
+        //std::cout << "Inputs: " << numInputs << " Outputs: " << numOutputs << "\n";
+        double* d = l.deltaList.data();
+        double* db = l.deltaBias.data();
         for(int j = 0; j< numInputs*numOutputs;++j){
             d[j] = 0;
         }
@@ -157,8 +176,8 @@ void Net::zeroGrad(){
             db[j] = 0;
         }
     }
-    std::cout << "Finised zero grad\n";
-    std::cout << "Does it fail after print\n";
+    //std::cout << "Finised zero grad\n";
+    //std::cout << "Does it fail after print\n";
 }
 
 void Net::backwardStep(std::vector<double> output,std::vector<double> target){
@@ -169,19 +188,19 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
 
     int layers = net.size();
     for(int curLayer = layers-1; curLayer>0; --curLayer){
-        Layer* l = net[curLayer];
-        int numInputs = l->inputs;
-        int numOutputs  =l->outputs;
+        Layer l = net[curLayer];
+        int numInputs = l.inputs;
+        int numOutputs  =l.outputs;
 
-        double* weights = l->weights.data();
-        double* nodeOutput = l->nodeOutput.data();
-        double* deltaBias = l->deltaBias.data();
-        double* deltaList = l->deltaList.data();
+        double* weights = l.weights.data();
+        double* nodeOutput = l.nodeOutput.data();
+        double* deltaBias = l.deltaBias.data();
+        double* deltaList = l.deltaList.data();
 
         if(curLayer == layers-1 && layers-1 != 0){
             errors.resize(target.size());
 
-            double* inputList = net[curLayer-1]->nodeOutput.data();
+            double* inputList = net[curLayer-1].nodeOutput.data();
             
             // get errors output node
             if(meanLoss){
@@ -242,7 +261,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             }
         }
         else{
-            double* inputList = net[curLayer-1]->nodeOutput.data();
+            double* inputList = net[curLayer-1].nodeOutput.data();
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
             auto funcPointer = activations[curLayer];
             #pragma omp parallel for num_threads(Config::numThreads)
@@ -275,13 +294,13 @@ void Net::updateWeights(){
     int layers = net.size();
     // update gradients
     for(int currLayer = 0;currLayer < layers;++currLayer){
-        int numInputs = net[currLayer]->inputs;
-        int numOutputs  = net[currLayer]->outputs;
+        int numInputs = net[currLayer].inputs;
+        int numOutputs  = net[currLayer].outputs;
 
-        double* weights = net[currLayer]->weights.data();
-        double* bias = net[currLayer]->bias.data();
-        double* deltaBias = net[currLayer]->deltaBias.data();
-        double* deltaList =net[currLayer]->deltaList.data();
+        double* weights = net[currLayer].weights.data();
+        double* bias = net[currLayer].bias.data();
+        double* deltaBias = net[currLayer].deltaBias.data();
+        double* deltaList =net[currLayer].deltaList.data();
         
         #pragma omp parallel for num_threads(Config::numThreads)
         for(int j = 0; j < numOutputs; ++j){
@@ -296,16 +315,9 @@ void Net::updateWeights(){
     totalTrain = 0;
 }
 
-Layer Net::getLayer(int layer){
-    if(layer >= (int)net.size()){
-        throw std::runtime_error("Get Layer out of bounds");
-    }
-    return *net[layer];
-}
-
 
 // Methods for Layer Class
-void Layer::normal_distribution_weights(){
+void Net::normal_distribution_weights(double* weights, double* bias, int inputs, int outputs){
     std::random_device rd{};
     std::mt19937 gen{rd()};
     std::normal_distribution<double> distribution(.50,2.0);
@@ -330,46 +342,55 @@ void Layer::normal_distribution_weights(){
 }
 
 
-std::vector<double> Layer::ff(std::vector<double> x){
-    
+std::vector<double> Net::ff(std::vector<double> x, int layer){
+    if(layer >= (int)net.size()){
+        throw std::runtime_error("Mismatched dims in index");
+    }
+
+    Layer l = net[layer];
+
+    int inputs = l.inputs;
+    int outputs = l.outputs;
+    double* bias = l.bias.data();
+    double* weights = l.weights.data();
+    double* nodeOutput = l.nodeOutput.data();
+
     if ((int)x.size() != inputs){
         throw std::runtime_error("Mismatched dims in index");
     }
     else{
-        std::cout << "Input is length " << x.size() << "\n";
+        //std::cout << "Input is length " << x.size() << "\n";
     }
+    //std::cout << "Time for feed forward\n";
     std::vector<double> ret(outputs,0.0);
     
-    std::cout << "Check first input\n";
+    //std::cout << "Check first input\n";
     if(Config::firstInputs == NULL){
         Config::firstInputs = x.data();
     }
-    std::cout << "Get data\n";
-    double* r = ret.data();
 
-    std::cout << "Set Bias\n";
+    //std::cout << "Set Bias\n";
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int j = 0; j<outputs;++j){
-        r[j] = bias[j];
+        ret[j] = bias[j];
     }
 
-    std::cout << "multiply by weights\n";
+    //std::cout << "multiply by weights\n";
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int i = 0; i < inputs; ++i){
-        std::cout << "Starting Node " << i << "\n";
+       //std::cout << "Starting Node " << i << "\n";
         for(int j = 0; j<outputs; ++j){
             #pragma omp critical
             {
-                r[i] += x[i]*weights[i*outputs+j];
+                ret[i] += x[i]*weights[i*outputs+j];
             }
             //std::cout << "Completed weight " << j << "\n";  
         }
         
-        nodeOutput[i] = r[i];
+        nodeOutput[i] = ret[i];
     }
     std::cout << "finished multiply\n";
-    return ret;
-    
+    return ret;    
 }
 
 
@@ -377,14 +398,10 @@ std::vector<double> Layer::ff(std::vector<double> x){
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(projNet,m){
-  py::class_<Layer>(m,"Layer")
-    .def(py::init<int,int>())
-    .def("ff",&Layer::ff);
-  
+PYBIND11_MODULE(projNet,m){  
   py::class_<Net>(m,"Net")
     .def(py::init<>())
-    .def("getLayer",&Net::getLayer)
+    .def("ff",&Net::ff)
     .def("addLayer",&Net::addLayer)
     .def("setLearningRate",&Net::setLearningRate)
     .def("relu",&Net::relu)
@@ -392,7 +409,8 @@ PYBIND11_MODULE(projNet,m){
     .def("leakyRelu",&Net::leakyRelu)
     .def("updateWeights",&Net::updateWeights)
     .def("crossEntropy",&Net::crossEntropy)
-    .def("zeroGrad",&Net::zeroGrad);
+    .def("zeroGrad",&Net::zeroGrad)
+    .def("Net::printDim",&Net::printDim);
 
   m.def("setThreads",&Config::setThreads);
   

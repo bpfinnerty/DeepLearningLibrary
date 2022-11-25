@@ -18,37 +18,40 @@ namespace Config{
     double* firstInputs = NULL;
 }
 
-class Layer{
+class Net{
     
     public:
-        std::vector<double> weights;
-        std::vector<double> bias;
-        std::vector<double> nodeOutput;
-        std::vector<double> deltaList;
-        std::vector<double> deltaBias;
-        int inputs;
-        int outputs;
+        struct Layer{
+            std::vector<double> weights;
+            std::vector<double> bias;
+            std::vector<double> nodeOutput;
+            std::vector<double> deltaList;
+            std::vector<double> deltaBias;
+            int inputs;
+            int outputs;
+        };
 
 
-        Layer(int input, int output): inputs(input), outputs(output) {
-            weights.resize(inputs*outputs);
-            bias.resize(outputs);
-            nodeOutput.resize(outputs);
+        // Layer(int input, int output): inputs(input), outputs(output) {
+        //     weights.resize(inputs*outputs);
+        //     bias.resize(outputs);
+        //     nodeOutput.resize(outputs);
             
-            normal_distribution_weights();
+        //     normal_distribution_weights();
             
-            deltaList.resize(inputs*outputs,0.0);
-            deltaBias.resize(outputs,0.0);
-        }
+        //     deltaList.resize(inputs*outputs,0.0);
+        //     deltaBias.resize(outputs,0.0);
+        // }
 
-        void normal_distribution_weights();
+        void normal_distribution_weights(double* weights, double* bias, int inputs, int outputs);
 
-        std::vector<double> ff(std::vector<double> x);
-};
+        std::vector<double> ff(std::vector<double> x, int layer);
+        int getInputs();
+        int getOutputs();
 
-class Net{
-    public:
-        std::vector<Layer*> net;
+
+
+        std::vector<Layer> net;
         std::vector<double (Net::*)(double)> activations;
 
         void addLayer(int input, int output);
@@ -75,6 +78,8 @@ class Net{
         void backwardStep(std::vector<double> output,std::vector<double> target);
         void updateWeights();
         void zeroGrad();
+
+        void printDim(int layer);
 
         bool gpu_check = false;
         bool softBool = false;
