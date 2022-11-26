@@ -22,13 +22,13 @@ class Net{
     
     public:
         struct Layer{
-            double* weights;
-            double* bias;
-            double* nodeOutput;
-            double* deltaList;
-            double* deltaBias;
-            int* inputs;
-            int* outputs;
+            std::vector<double> weights;
+            std::vector<double> bias;
+            std::vector<double> nodeOutput;
+            std::vector<double> deltaList;
+            std::vector<double> deltaBias;
+            int inputs;
+            int outputs;
         };
 
 

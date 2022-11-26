@@ -14,16 +14,18 @@ def main(learningRate, numThreads, epoch, batch_size, model):
     initialBias = np.array([[1.6,.7],[0,0,1]],dtype=object)
     
     for i in range(initialWeights.shape[0]):
-        print("Pre Layer "+str(i)+" Weights & Bias:\n")
+        print("\nPre Layer "+str(i)+" Weights & Bias:\n")
         model.neuralNet.printWeights(i)
         model.neuralNet.printBias(i)
     
     for i in range(initialWeights.shape[0]):
+        
+        print("\nPre Layer "+str(i)+" Weights & Bias:\n")
         model.neuralNet.setWeights(initialWeights[i],i)
         model.neuralNet.setBias(initialBias[i],i)
         
     for i in range(initialWeights.shape[0]):
-        print("Layer "+str(i)+" Weights & Bias:\n")
+        print("\nLayer "+str(i)+" Weights & Bias:\n")
         model.neuralNet.printWeights(i)
         model.neuralNet.printBias(i)
     
