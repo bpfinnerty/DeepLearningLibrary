@@ -37,7 +37,7 @@ def main(learningRate, numThreads, epoch, batch_size, model):
     print(softMaxPred)
     
     print("Entropy Loss")
-    loss = model.neuralNet.MSLOSS(softMaxPred,target)
+    loss = model.neuralNet.msLoss(softMaxPred,target)
     print(loss)
     
     print("Backward Step")
