@@ -10,9 +10,9 @@ def main(learningRate, numThreads, epoch, batch_size, model):
     model.neuralNet.setLearningRate(learningRate)
     projNet.setThreads(numThreads)
     
-    initialWeights = np.array([[-2.5,-1.5,.6,.4],[-.1,2.4,-2.2,1.5,-5.2,3.7]],dtype=object)
-    initialBias = np.array([[1.6,.7],[-2,0,1]],dtype=object)
-    target = [1,0,0]
+    initialWeights = np.array([[.15,.25,.20,.30],[.40,.70,.45,.55]],dtype=object)
+    initialBias = np.array([[.35,.35],[.60,.60]],dtype=object)
+    target = [.01,.99]
     
     for i in range(initialWeights.shape[0]):
         print("\nPre Layer "+str(i)+" Weights & Bias:\n")
@@ -30,20 +30,28 @@ def main(learningRate, numThreads, epoch, batch_size, model):
         model.neuralNet.printWeights(i)
         model.neuralNet.printBias(i)
     
-    inputArray = np.array([.04,.42])
+    inputArray = np.array([.05,.10])
     
     softMaxPred = model.forward(inputArray)
     print("Soft max output")
     print(softMaxPred)
     
+    print("Entropy Loss")
+    loss = model.neuralNet.MSLOSS(softMaxPred,target)
+    print(loss)
+    
     print("Backward Step")
     model.neuralNet.backwardStep(softMaxPred,target)
     
     print("Weight Gradients")
-    model.neuralNetwork.printGrad()
+    model.neuralNet.printGrad()
     
     print("Bias Gradients")
-    model.neuralNetwork.printBiasGrad()
+    model.neuralNet.printBiasGrad()
+    
+    
+    print("test Cross Entropy")
+    print(model.neuralNet.crossEntropy(np.array([.7,.2,.1]),np.array([1,0,0])))
     
     
         

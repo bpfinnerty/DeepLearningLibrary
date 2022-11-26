@@ -61,7 +61,7 @@ void Net::setWeights(std::vector<double> startWeights, int layer){
 
 
 void Net::setBias(std::vector<double> startBias, int layer){
-    if(layer>=(int)net.size()){
+    if(layer>=(int)(net.size()/layerSize)){
         throw std::runtime_error("Layer out of bounds");
     }
     double* bias = net[layer*layerSize+ biasOffset].data();
@@ -109,7 +109,7 @@ std::vector<double> Net::relu(std::vector<double> x){
 
 std::vector<double> Net::leakyRelu(std::vector<double> x){
     //std::cout << "Time for leaky Relu\n";
-    if(activations.size() != net.size()/layerSize){
+    if((int)activations.size() != (int)(net.size()/layerSize)){
         activations.push_back(&Net::leakyRelu_deriv);
     }
     
@@ -124,12 +124,19 @@ std::vector<double> Net::leakyRelu(std::vector<double> x){
     return ret;
 }
 
-// double MSLOSS(std::vector<double> x,std::vector<double> target){
-//     double ret;
-//     int size = x.size();
-
-//     return ret;
-// }
+double Net::msLoss(std::vector<double> x,std::vector<double> target){
+    if(x.size() != target.size()){
+        throw std::runtime_error("Mismatched dimensions for Loss");
+    }
+    meanLoss = true;
+    double ret = 0.0;
+    int size = x.size();
+    for(int i = 0; i<size;++i){
+        ret += (pow((x[i]-target[i]),2));
+    }
+    ret = ret*.5;
+    return ret;
+}
 
 double Net::relu_deriv(double x){
     if (x <=0){
@@ -163,7 +170,7 @@ double Net::crossEntropy(std::vector<double> output,std::vector<double> target){
 }
 
 std::vector<double> Net::softMax(std::vector<double> x){
-    if(activations.size() != net.size()){
+    if((int)activations.size() != (int)(net.size()/layerSize)){
         activations.push_back(&Net::leakyRelu_deriv);
     }
     softBool = true;
@@ -198,7 +205,7 @@ double Net::softMax_deriv(double* x, int focus, int outputLen){
 
 
 void Net::zeroGrad(){
-    int totalLayer = net.size();
+    int totalLayer = net.size()/layerSize;
     //std::cout << "Numer of Layers: " << totalLayer << "\n";
     
     for(int layer = 0; layer<totalLayer;++layer){
@@ -222,8 +229,6 @@ void Net::zeroGrad(){
 
 void Net::backwardStep(std::vector<double> output,std::vector<double> target){
     std::vector<double> errors;
-    
-    
     totalTrain++;
 
     int layers = net.size()/layerSize;
@@ -244,9 +249,10 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             
             // get errors output node
             if(meanLoss){
-            #pragma omp parallel for num_threads(Config::numThreads)
+                #pragma omp parallel for num_threads(Config::numThreads)
                 for(int i = 0; i <numOutputs; ++i){
                     errors[i]=output[i]-target[i];
+                    std::cout << errors[i] << ", ";
                 }
             }else{
                 for(int i = 0; i < numOutputs;++i){
@@ -356,7 +362,7 @@ void Net::printBias(int layer){
 }
 
 void Net::printGrad(){
-    for(int i = 0; i<(int)net.size();++i){
+    for(int i = 0; i<(int)net.size()/layerSize;++i){
         std::cout << "\nLayer: " << i << "\n";
         int inputs = sizes[i*2];
         int outputs = sizes[i*2+1];
@@ -370,7 +376,7 @@ void Net::printGrad(){
 }
 
 void Net::printBiasGrad(){
-    for(int i = 0; i<(int)net.size();++i){
+    for(int i = 0; i<(int)net.size()/layerSize;++i){
         
         std::cout << "\nLayer: " << i << "\n";
         int outputs = sizes[i*2+1];
@@ -384,7 +390,7 @@ void Net::printBiasGrad(){
 }
 
 void Net::updateWeights(){
-    int layers = net.size();
+    int layers = net.size()/layerSize;
     // update gradients
     for(int currLayer = 0;currLayer < layers;++currLayer){
         int numInputs = sizes[currLayer*2];
@@ -452,7 +458,7 @@ void Net::normal_distribution_weights(double* weights, double* bias, int inputs,
 
 
 std::vector<double> Net::ff(std::vector<double> x, int layer){
-    if(layer >= (int)net.size()){
+    if(layer >= (int)net.size()/layerSize){
         throw std::runtime_error("Mismatched dims in index");
     }
 
@@ -530,6 +536,7 @@ PYBIND11_MODULE(projNet,m){
     .def("setBias",&Net::setBias)
     .def("printGrad",&Net::printGrad)
     .def("printBiasGrad",&Net::printBiasGrad)
+    .def("msLoss",&Net::msLoss)
     .def("printDim",&Net::printDim);
     
 

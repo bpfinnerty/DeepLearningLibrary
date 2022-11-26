@@ -82,7 +82,8 @@ class Net{
         void printGrad();
         void printBiasGrad();
         
-        //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
+        
+        double msLoss(std::vector<double> x,std::vector<double> target);
         double crossEntropy(std::vector<double> output,std::vector<double> target);
         //std::vector<double> crossEntropy_deriv(std::vector<double> output,std::vector<double> target);
         std::vector<double> softMax(std::vector<double> x);

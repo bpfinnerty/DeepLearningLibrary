@@ -94,7 +94,11 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                 index+=1
                 counter+=1
                 
+                print("Weight Gradients")
                 model.neuralNet.printGrad()
+                
+                print("Bias Gradients")
+                model.neuralNet.printBiasGrad()
             #print("finished batch")
             model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + " for epoch: " + str(e))

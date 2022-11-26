@@ -4,9 +4,9 @@ class modelMLP():
 
     def __init__(self):
         self.neuralNet = projNet.Net()
-        self.neuralNet.addLayer(784,256)
-        self.neuralNet.addLayer(256,64)
-        self.neuralNet.addLayer(64,10)
+        self.neuralNet.addLayer(784,16)
+        self.neuralNet.addLayer(16,16)
+        self.neuralNet.addLayer(16,10)
         
 
     def forward(self, val):
