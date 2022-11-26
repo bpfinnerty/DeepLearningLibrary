@@ -11,23 +11,26 @@ def oneHotEncode(vector,numClasses):
     return encoded_array
 
 def testAccuracy(model, test_df):
-    print("In Test Accuracy\n")
+    # print("In Test Accuracy\n")
     
     
-    print("convert to numpy")
+    # print("convert to numpy")
     truth_subset = test_df.iloc[:,0].to_numpy()
+    # print(truth_subset)
     test_subset = test_df.iloc[:,1:].to_numpy()
+    print(test_subset.shape)
     
-    print("Get shape")
+    # print("Get shape")
     max_examples = test_subset.shape[0]
+    # print(max_examples)
     
     index = 0
     totalCorrect = 0
-    print("ready for loop")
+    # print("ready for loop")
     
     while index < max_examples:
         predictions = model.forward(test_subset[index])
-        # print("Predicted Value: " +  str(predictions))
+        # print("Predicted Value: " +  str(np.argmax(predictions)))
         # print("Actual: " + str(truth_subset[index]))
         if(np.argmax(predictions) == truth_subset[index]):
             totalCorrect+=1
@@ -39,8 +42,11 @@ def testAccuracy(model, test_df):
 
 def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath, model):
     
-    train_df = pd.read_csv(trainDataPath,header=None,skiprows=1)
-    test_df = pd.read_csv(testDataPath,header=None,skiprows=1).sample(frac=.01)
+    df = pd.read_csv(trainDataPath,header=None,skiprows=1)
+    t_df = pd.read_csv(testDataPath,header=None,skiprows=1)
+    # print(df)
+   
+    # print(test_df.shape)
     #print("opened data")
     
     model.neuralNet.setLearningRate(learningRate)
@@ -50,6 +56,8 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     
     for e in range(0,epoch):
         print("epoch: " + str(e))
+        train_df = df.sample(frac=.5)
+        test_df = t_df.sample(frac=.2)
         
         # print("\nDimensions\n")
         
@@ -61,11 +69,10 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         # print("\bias\n")
         # model.neuralNet.printBias(4)
         
-        shuffled = train_df.sample(frac=.1)
-        truth_subset = shuffled.iloc[:,11].to_numpy()
-        train_subset = shuffled.iloc[:,0:11].to_numpy()
-        print(train_subset.shape)
-        encoded_truth = oneHotEncode(truth_subset,11)
+        
+        truth_subset = train_df.iloc[:,0].to_numpy()
+        train_subset = train_df.iloc[:,1:].to_numpy()
+        encoded_truth = oneHotEncode(truth_subset,10)
         
         
         max_examples = encoded_truth.shape[0]
@@ -109,6 +116,8 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
             model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + " for epoch: " + str(e))
         testAccuracy(model,test_df)
+    print("finished")
+    exit(1)
             
         
         
@@ -118,13 +127,13 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
 if __name__ == "__main__":
     
-    learningRate = 0.01
-    numThreads = 8
-    epoch = 3
-    batch = 16
+    learningRate = 0.02
+    numThreads = 12
+    epoch = 300
+    batch = 8
     
-    trainingDataPath = "winequality-red.csv"
-    testingDataPath = "winequality-red.csv"
+    trainingDataPath = "mnist_train.csv"
+    testingDataPath = "mnist_test.csv"
     
     model = modelMLP()
     
