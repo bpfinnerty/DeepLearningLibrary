@@ -10,9 +10,9 @@ def oneHotEncode(vector,numClasses):
     encoded_array[np.arange(vector.size),vector] = 1 
     return encoded_array
 
-def testAccuracy(model, testingData):
+def testAccuracy(model, test_df):
     print("In Test Accuracy\n")
-    test_df = pd.read_csv(testingData,header=None,skiprows=1).sample(frac=.0001)
+    
     
     print("convert to numpy")
     truth_subset = test_df.iloc[:,0].to_numpy()
@@ -26,7 +26,7 @@ def testAccuracy(model, testingData):
     print("ready for loop")
     
     while index < max_examples:
-        predictions = model.forward(test_subset[index]/256)
+        predictions = model.forward(test_subset[index])
         # print("Predicted Value: " +  str(predictions))
         # print("Actual: " + str(truth_subset[index]))
         if(np.argmax(predictions) == truth_subset[index]):
@@ -40,6 +40,7 @@ def testAccuracy(model, testingData):
 def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath, model):
     
     train_df = pd.read_csv(trainDataPath,header=None,skiprows=1)
+    test_df = pd.read_csv(testDataPath,header=None,skiprows=1).sample(frac=.01)
     #print("opened data")
     
     model.neuralNet.setLearningRate(learningRate)
@@ -60,10 +61,11 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         # print("\bias\n")
         # model.neuralNet.printBias(4)
         
-        shuffled = train_df.sample(frac=.001)
-        truth_subset = shuffled.iloc[:,0].to_numpy()
-        train_subset = shuffled.iloc[:,1:].to_numpy()
-        encoded_truth = oneHotEncode(truth_subset,10)
+        shuffled = train_df.sample(frac=.1)
+        truth_subset = shuffled.iloc[:,11].to_numpy()
+        train_subset = shuffled.iloc[:,0:11].to_numpy()
+        print(train_subset.shape)
+        encoded_truth = oneHotEncode(truth_subset,11)
         
         
         max_examples = encoded_truth.shape[0]
@@ -88,8 +90,8 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                 if index >= max_examples:
                     break
                 #print(counter)
-                model.neuralNet.setInput(train_subset[index]/256)
-                predictions = model.forward(train_subset[index]/256)
+                model.neuralNet.setInput(train_subset[index])
+                predictions = model.forward(train_subset[index])
                 #print(predictions)
                 #print("Encoded Truth: " + str(encoded_truth[index]))
                 loss = model.neuralNet.crossEntropy(predictions, encoded_truth[index])
@@ -106,7 +108,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
             #print("finished batch")
             model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + " for epoch: " + str(e))
-        testAccuracy(model,testDataPath)
+        testAccuracy(model,test_df)
             
         
         
@@ -121,8 +123,8 @@ if __name__ == "__main__":
     epoch = 3
     batch = 16
     
-    trainingDataPath = "mnist_train.csv"
-    testingDataPath = "mnist_test.csv"
+    trainingDataPath = "winequality-red.csv"
+    testingDataPath = "winequality-red.csv"
     
     model = modelMLP()
     
