@@ -15,7 +15,6 @@
 namespace Config{
     int numThreads = 1;
     void setThreads(int t);
-    double* firstInputs = NULL;
 }
 
 class Net{
@@ -43,6 +42,7 @@ class Net{
         //     deltaBias.resize(outputs,0.0);
         // }
 
+        void setInput(std::vector<double> x);
         void normal_distribution_weights(double* weights, double* bias, int inputs, int outputs);
         void setWeights(std::vector<double> startWeights, int layer);
         void setBias(std::vector<double> startBias, int layer);
@@ -61,9 +61,11 @@ class Net{
         int outputOffset = 2;
         int weightDeltaOffset = 3;
         int biasDeltaOffset = 4;
+        std::vector<double> firstInputs;
         
         std::vector<int> sizes;
-        std::vector<double (Net::*)(double)> activations;
+        std::vector<std::vector<double> (Net::*)(std::vector<double>)> activations;
+        std::vector<double (Net::*)(double)> activations_deriv;
 
         void addLayer(int input, int output);
 

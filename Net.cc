@@ -16,6 +16,14 @@ namespace Config{
     }
 }
 
+void Net::setInput(std::vector<double> x){
+    firstInputs.resize(x.size(),0.0);
+    double* fs = firstInputs.data();
+    for(int i = 0;i<(int)x.size();++i){
+        fs[i] = x[i];
+    }
+}
+
 void Net::addLayer(int inputs, int outputs){
 
     std::vector<double> weights(inputs*outputs);
@@ -53,10 +61,10 @@ void Net::setWeights(std::vector<double> startWeights, int layer){
     for(int i = 0; i<(int)startWeights.size();++i){
         weights[i] = startWeights[i];
     }
-    for(int i = 0; i<(int)startWeights.size();++i){
-        std::cout << weights[i] << " ,";
-    }
-    std::cout << "\n";
+    // for(int i = 0; i<(int)startWeights.size();++i){
+    //     std::cout << weights[i] << " ,";
+    // }
+    // std::cout << "\n";
 }
 
 
@@ -73,12 +81,12 @@ void Net::setBias(std::vector<double> startBias, int layer){
     }
     for(int i = 0; i<(int)startBias.size();++i){
         bias[i] = startBias[i];
-        std::cout << bias[i] << " ,";
+        // std::cout << bias[i] << " ,";
     }
-    for(int i = 0; i<(int)startBias.size();++i){
-        std::cout << bias[i] << " ,";
-    }
-    std::cout << "\n";
+    // for(int i = 0; i<(int)startBias.size();++i){
+    //     std::cout << bias[i] << " ,";
+    // }
+    // std::cout << "\n";
 }
 
 void Net::printDim(int layer){
@@ -95,7 +103,8 @@ void Net::setLearningRate(double x){
 std::vector<double> Net::relu(std::vector<double> x){
     int size = x.size();
     if(activations.size() != net.size()){
-        activations.push_back(&Net::relu_deriv);
+        activations.push_back(&Net::relu);
+        activations_deriv.push_back(&Net::relu_deriv);
     }
     std::vector<double> ret(size);
     
@@ -110,7 +119,8 @@ std::vector<double> Net::relu(std::vector<double> x){
 std::vector<double> Net::leakyRelu(std::vector<double> x){
     //std::cout << "Time for leaky Relu\n";
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        activations.push_back(&Net::leakyRelu_deriv);
+        activations.push_back(&Net::leakyRelu);
+        activations_deriv.push_back(&Net::leakyRelu_deriv);
     }
     
     int size = x.size();
@@ -171,7 +181,8 @@ double Net::crossEntropy(std::vector<double> output,std::vector<double> target){
 
 std::vector<double> Net::softMax(std::vector<double> x){
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        activations.push_back(&Net::leakyRelu_deriv);
+        activations.push_back(&Net::softMax);
+        activations.push_back(&Net::leakyRelu);
     }
     softBool = true;
     std::vector<double> ret(x.size(),0.0);
@@ -228,31 +239,37 @@ void Net::zeroGrad(){
 }
 
 void Net::backwardStep(std::vector<double> output,std::vector<double> target){
+    
+    if(firstInputs.size() == 0){
+        throw std::runtime_error("Must set function input with setInput()\n");
+    }
+    double* firstInputLayer = firstInputs.data();
     std::vector<double> errors;
     totalTrain++;
 
     int layers = net.size()/layerSize;
-    for(int curLayer = layers-1; curLayer>0; --curLayer){
+    for(int curLayer = layers-1; curLayer>=0; --curLayer){
         
         int numInputs = sizes[curLayer*2];
         int numOutputs = sizes[curLayer*2+1];
         
         double* weights = net[curLayer*layerSize+ weightsOffset].data();
-        double* nodeOutput = net[curLayer*layerSize+ weightsOffset].data();
+        double* nodeOutput = net[curLayer*layerSize+ outputOffset].data();
         double* deltaBias = net[curLayer*layerSize+ biasDeltaOffset].data();
         double* deltaList = net[curLayer*layerSize+ weightDeltaOffset].data();
 
         if(curLayer == layers-1 && layers-1 != 0){
             errors.resize(target.size());
 
-            double* inputList = net[(curLayer-1)*layerSize+ outputOffset].data();
+            std::vector<double> act = net[(curLayer-1)*layerSize+ outputOffset];
+            std::vector<double> dataList;
+            double* inputList;
             
             // get errors output node
             if(meanLoss){
                 #pragma omp parallel for num_threads(Config::numThreads)
                 for(int i = 0; i <numOutputs; ++i){
                     errors[i]=output[i]-target[i];
-                    std::cout << errors[i] << ", ";
                 }
             }else{
                 for(int i = 0; i < numOutputs;++i){
@@ -262,54 +279,68 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
 
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
             if(softBool){
+                dataList = softMax(act);
+                inputList = dataList.data();
                 for(int i = 0; i<numOutputs;++i){
                     // error * derivative of activation
                     errors[i] *= softMax_deriv(nodeOutput,i,numOutputs);
                 }
             }else{
-                
-                auto funcPointer = activations[curLayer];
+                auto fp = activations[curLayer-1];
+                dataList = (this->*fp)(act);
+                inputList = dataList.data();
+
+
+                auto funcPointer = activations_deriv[curLayer];
                 #pragma omp parallel for num_threads(Config::numThreads)
                 for(int i = 0; i<numOutputs;++i){
-                    errors[i] *= (this->*funcPointer)(nodeOutput[i]);
+                    double outputActivation = (this->*funcPointer)(nodeOutput[i]);
+                    errors[i] *= outputActivation;
                 }
             }
 
             #pragma omp parallel for num_threads(Config::numThreads)
             for(int i = 0; i<numOutputs; ++i){
-                
-                
                 // get gradient for delta term.
                 deltaBias[i] += errors[i];
                 
                 // get gradients for all weights
                 for(int j = 0; j<numInputs; ++j){
+                    
                     deltaList[j*numOutputs+i] += errors[i] * inputList[j];
                 }
             }
+
         }
         else if(curLayer == 0){
-
+            
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
-            auto funcPointer = activations[curLayer];
+            auto funcPointer = activations_deriv[curLayer];
             #pragma omp parallel for num_threads(Config::numThreads)
             for(int i = 0; i<numOutputs; ++i){
                 // error * derivative of activation
-                errors[i] *= (this->*funcPointer)(nodeOutput[i]);
+                double deriv_temp = (this->*funcPointer)(nodeOutput[i]);
+                errors[i] *= deriv_temp;
                 
                 // get gradient for delta term.
                 deltaBias[i] += errors[i];
                 
                 // get gradients for all weights
                 for(int j = 0; j<numInputs; ++j){
-                    deltaList[j*numOutputs+i] += errors[i] * Config::firstInputs[j];
+                    deltaList[j*numOutputs+i] += errors[i] * firstInputLayer[j];
                 }
             }
         }
         else{
-            double* inputList = net[(curLayer-1)*layerSize+ outputOffset].data();
-            // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
-            auto funcPointer = activations[curLayer];
+            std::vector<double> act = net[(curLayer-1)*layerSize+ outputOffset];
+            std::vector<double> dataList;
+            double* inputList;
+
+            auto fp = activations[curLayer-1];
+            dataList = (this->*fp)(act);
+            inputList = dataList.data();
+            // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta PLUM
+            auto funcPointer = activations_deriv[curLayer]; 
             #pragma omp parallel for num_threads(Config::numThreads)
             for(int i = 0; i<numOutputs; ++i){
                 // error * derivative of activation
@@ -328,13 +359,13 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
         std::vector<double> newErrors(numInputs,0.0);
         for(int i = 0; i<numInputs;++i){
             for(int j = 0; j<numOutputs;++j){
-                newErrors[i] += errors[i]*weights[i*numInputs+j];
+                double temp = errors[j]*weights[i*numOutputs+j];
+                newErrors[i] += temp;
             }
             errors[i] = newErrors[i];
-        }
-        
+        }        
     }  
-    Config::firstInputs = NULL;
+    firstInputs.clear();
 }
 
 void Net::printWeights(int layer){
@@ -362,6 +393,7 @@ void Net::printBias(int layer){
 }
 
 void Net::printGrad(){
+    std::cout << "In printGrad\n";
     for(int i = 0; i<(int)net.size()/layerSize;++i){
         std::cout << "\nLayer: " << i << "\n";
         int inputs = sizes[i*2];
@@ -417,18 +449,23 @@ void Net::updateWeights(){
 
 std::vector<double> Net::Sigmoid(std::vector<double> x){
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        activations.push_back(&Net::sigmoid_deriv);
+        activations.push_back(&Net::Sigmoid);
+        activations_deriv.push_back(&Net::sigmoid_deriv);
     }
     std::vector<double> ret(x.size(),0.0);
+    
     #pragma omp parallel for num_threads(Config::numThreads)
     for(int i =0; i<(int)x.size();++i){
         ret[i] = (1.0)/(1.0+exp(-x[i]));
+
     }
     return ret;
 }
 
 double Net::sigmoid_deriv(double x){
-    return x*(1-x);
+
+    double sigOutput = (1.0)/(1.0+exp(-x));
+    return sigOutput * (1-sigOutput);
 }
 
 // Methods for Layer Class
@@ -439,7 +476,7 @@ void Net::normal_distribution_weights(double* weights, double* bias, int inputs,
     int i = 0;
     int size = inputs*outputs;
     while(i< size){
-        double w = distribution(gen);
+        double w = distribution(gen)/10;
         if (w >= 0.0 && w <=1.0){
             weights[i] = w;
             i++;
@@ -480,10 +517,7 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
     //std::cout << "Outputs: " << outputs << "\n";
     std::vector<double> ret(outputs,0.0);
     
-    //std::cout << "Check first input\n";
-    if(Config::firstInputs == NULL){
-        Config::firstInputs = x.data();
-    }
+    
 
     //std::cout << "Set Bias\n";
     #pragma omp parallel for num_threads(Config::numThreads)
@@ -519,6 +553,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(projNet,m){  
   py::class_<Net>(m,"Net")
     .def(py::init<>())
+    .def("setInput",&Net::setInput)
     .def("ff",&Net::ff)
     .def("addLayer",&Net::addLayer)
     .def("setLearningRate",&Net::setLearningRate)

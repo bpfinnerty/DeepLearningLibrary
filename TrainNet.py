@@ -40,26 +40,21 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     
     model.neuralNet.setLearningRate(learningRate)
     projNet.setThreads(numThreads)
-    
-    # model.getNet().printDim(0)
-    # model.getNet().printWeights(0)
-    # model.getNet().printBias(0)
-    # model.getNet().printDim(1)
-    # model.getNet().printWeights(1)
-    # model.getNet().printBias(1)
-    # model.getNet().printDim(2)
-    # model.getNet().printWeights(2)
-    # model.getNet().printBias(2)
-    # model.getNet().printDim(3)
-    # model.getNet().printWeights(3)
-    # model.getNet().printBias(3)
-    # model.getNet().printDim(4)
-    # model.getNet().printWeights(4)
-    # model.getNet().printBias(4)
+
     #print("Set initial values")
     
     for e in range(0,epoch):
         print("epoch: " + str(e))
+        
+        print("\nDimensions\n")
+        
+        model.neuralNet.printDim(4)
+        
+        print("\weight\n")
+        model.neuralNet.printWeights(4)
+        
+        print("\bias\n")
+        model.neuralNet.printBias(4)
         
         shuffled = train_df.sample(frac=.001)
         truth_subset = shuffled.iloc[:,0].to_numpy()
@@ -80,12 +75,16 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
             model.neuralNet.zeroGrad()
             
+            # print("Weight Gradients")
+            # model.neuralNet.printGrad()
+            
             #print("After grad")
             counter = 0
             while counter < batch_size:
                 if index >= max_examples:
                     break
                 #print(counter)
+                model.neuralNet.setInput(train_subset[index])
                 predictions = model.forward(train_subset[index])
                 #print("Encoded Truth: " + str(encoded_truth[index]))
                 loss = model.neuralNet.crossEntropy(predictions, encoded_truth[index])
@@ -94,11 +93,11 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                 index+=1
                 counter+=1
                 
-                print("Weight Gradients")
-                model.neuralNet.printGrad()
+                # print("Weight Gradients")
+                # model.neuralNet.printGrad()
                 
-                print("Bias Gradients")
-                model.neuralNet.printBiasGrad()
+                # print("Bias Gradients")
+                # model.neuralNet.printBiasGrad()
             #print("finished batch")
             model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + " for epoch: " + str(e))
@@ -112,7 +111,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
 if __name__ == "__main__":
     
-    learningRate = 0.03
+    learningRate = 0.05
     numThreads = 1
     epoch = 1
     batch = 1
