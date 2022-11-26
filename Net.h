@@ -53,7 +53,7 @@ class Net{
 
 
 
-        std::vector<Layer*> net;
+        std::vector<Layer> net;
         std::vector<double (Net::*)(double)> activations;
 
         void addLayer(int input, int output);
