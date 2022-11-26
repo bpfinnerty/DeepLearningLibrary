@@ -11,7 +11,8 @@ def main(learningRate, numThreads, epoch, batch_size, model):
     projNet.setThreads(numThreads)
     
     initialWeights = np.array([[-2.5,-1.5,.6,.4],[-.1,2.4,-2.2,1.5,-5.2,3.7]],dtype=object)
-    initialBias = np.array([[1.6,.7],[0,0,1]],dtype=object)
+    initialBias = np.array([[1.6,.7],[-2,0,1]],dtype=object)
+    target = [1,0,0]
     
     for i in range(initialWeights.shape[0]):
         print("\nPre Layer "+str(i)+" Weights & Bias:\n")
@@ -32,7 +33,19 @@ def main(learningRate, numThreads, epoch, batch_size, model):
     inputArray = np.array([.04,.42])
     
     softMaxPred = model.forward(inputArray)
+    print("Soft max output")
     print(softMaxPred)
+    
+    print("Backward Step")
+    model.neuralNet.backwardStep(softMaxPred,target)
+    
+    print("Weight Gradients")
+    model.neuralNetwork.printGrad()
+    
+    print("Bias Gradients")
+    model.neuralNetwork.printBiasGrad()
+    
+    
         
             
         

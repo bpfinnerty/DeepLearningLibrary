@@ -21,15 +21,15 @@ namespace Config{
 class Net{
     
     public:
-        struct Layer{
-            std::vector<double> weights;
-            std::vector<double> bias;
-            std::vector<double> nodeOutput;
-            std::vector<double> deltaList;
-            std::vector<double> deltaBias;
-            int inputs;
-            int outputs;
-        };
+        // struct Layer{
+        //     std::vector<double> weights;
+        //     std::vector<double> bias;
+        //     std::vector<double> nodeOutput;
+        //     std::vector<double> deltaList;
+        //     std::vector<double> deltaBias;
+        //     int inputs;
+        //     int outputs;
+        // };
 
 
         // Layer(int input, int output): inputs(input), outputs(output) {
@@ -53,11 +53,19 @@ class Net{
 
 
 
-        std::vector<Layer> net;
+        std::vector<std::vector<double>> net;
+        
+        int layerSize = 5;
+        int weightsOffset = 0;
+        int biasOffset = 1;
+        int outputOffset = 2;
+        int weightDeltaOffset = 3;
+        int biasDeltaOffset = 4;
+        
+        std::vector<int> sizes;
         std::vector<double (Net::*)(double)> activations;
 
         void addLayer(int input, int output);
-        Layer getLayer(int layer);
 
         double learningRate = .01;
         
@@ -72,6 +80,7 @@ class Net{
 
         void printBias(int layer);
         void printGrad();
+        void printBiasGrad();
         
         //double MSLOSS(std::vector<double> inputs,std::vector<double> target);
         double crossEntropy(std::vector<double> output,std::vector<double> target);
