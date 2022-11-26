@@ -11,20 +11,24 @@ def oneHotEncode(vector,numClasses):
     return encoded_array
 
 def testAccuracy(model, testingData):
-    test_df = pd.read_csv(testingData,header=None,skiprows=1).sample(frac=.001)
+    print("In Test Accuracy\n")
+    test_df = pd.read_csv(testingData,header=None,skiprows=1).sample(frac=.0001)
     
+    print("convert to numpy")
     truth_subset = test_df.iloc[:,0].to_numpy()
     test_subset = test_df.iloc[:,1:].to_numpy()
     
+    print("Get shape")
     max_examples = test_subset.shape[0]
     
     index = 0
     totalCorrect = 0
-    #print("ready for loop")
+    print("ready for loop")
+    
     while index < max_examples:
-        predictions = model.forward(test_subset[index])
-        print("Predicted Value: " +  str(predictions))
-        print("Actual: " + str(truth_subset[index]))
+        predictions = model.forward(test_subset[index]/256)
+        # print("Predicted Value: " +  str(predictions))
+        # print("Actual: " + str(truth_subset[index]))
         if(np.argmax(predictions) == truth_subset[index]):
             totalCorrect+=1
         index+=1
@@ -46,15 +50,15 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     for e in range(0,epoch):
         print("epoch: " + str(e))
         
-        print("\nDimensions\n")
+        # print("\nDimensions\n")
         
-        model.neuralNet.printDim(4)
+        # model.neuralNet.printDim(4)
         
-        print("\weight\n")
-        model.neuralNet.printWeights(4)
+        # print("\weight\n")
+        # model.neuralNet.printWeights(4)
         
-        print("\bias\n")
-        model.neuralNet.printBias(4)
+        # print("\bias\n")
+        # model.neuralNet.printBias(4)
         
         shuffled = train_df.sample(frac=.001)
         truth_subset = shuffled.iloc[:,0].to_numpy()
@@ -84,8 +88,9 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
                 if index >= max_examples:
                     break
                 #print(counter)
-                model.neuralNet.setInput(train_subset[index])
-                predictions = model.forward(train_subset[index])
+                model.neuralNet.setInput(train_subset[index]/256)
+                predictions = model.forward(train_subset[index]/256)
+                #print(predictions)
                 #print("Encoded Truth: " + str(encoded_truth[index]))
                 loss = model.neuralNet.crossEntropy(predictions, encoded_truth[index])
                 avgLoss += loss
@@ -111,10 +116,10 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
 if __name__ == "__main__":
     
-    learningRate = 0.05
-    numThreads = 1
-    epoch = 1
-    batch = 1
+    learningRate = 0.01
+    numThreads = 8
+    epoch = 3
+    batch = 16
     
     trainingDataPath = "mnist_train.csv"
     testingDataPath = "mnist_test.csv"

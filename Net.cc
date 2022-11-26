@@ -435,10 +435,17 @@ void Net::updateWeights(){
         
         #pragma omp parallel for num_threads(Config::numThreads)
         for(int j = 0; j < numOutputs; ++j){
-            bias[j] -= (learningRate*deltaBias[j])/totalTrain;
+            double biasTemp = deltaBias[j];
+            biasTemp = biasTemp >= gradMaxThreshold ? gradMaxThreshold : biasTemp;
+            biasTemp = biasTemp <= gradMinThreshold ? gradMinThreshold : biasTemp;
+
+            bias[j] -= (learningRate*biasTemp)/totalTrain;
             deltaBias[j] = 0.0;
             for(int i = 0; i<numInputs;++i){
-                weights[i*numOutputs+j] -= (learningRate*deltaList[i*numOutputs+j])/totalTrain;
+                double temp = deltaList[i*numOutputs+j];
+                temp = temp >= gradMaxThreshold ? gradMaxThreshold : temp;
+                temp = temp <= gradMinThreshold ? gradMinThreshold : temp;
+                weights[i*numOutputs+j] -= (learningRate*temp)/totalTrain;
                 deltaList[i*numOutputs+j] = 0.0;
             }
         }
