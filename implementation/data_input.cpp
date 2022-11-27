@@ -6,8 +6,8 @@
 #include "data_input.h"
 #include <cmath>
 #include <random>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <../boost/algorithm/string.hpp>
+#include <../boost/lexical_cast.hpp>
 
 dataframe dataframe::getSample(double frac){
     std::vector<std::vector<double>> sample_data;

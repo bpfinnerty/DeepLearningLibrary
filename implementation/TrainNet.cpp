@@ -10,10 +10,10 @@ std::vector<double> forward(std::vector<double> val, Net neuralNet){
     ret = neuralNet.ff(ret, 1);
     ret = neuralNet.Sigmoid(ret);
     ret = neuralNet.ff(ret, 2);
-    ret = neuralNet.Sigmoid(ret);
-    ret = neuralNet.ff(ret, 3);
-    ret = neuralNet.Sigmoid(ret);
-    ret = neuralNet.ff(ret, 4);
+    // ret = neuralNet.Sigmoid(ret);
+    // ret = neuralNet.ff(ret, 3);
+    // ret = neuralNet.Sigmoid(ret);
+    // ret = neuralNet.ff(ret, 4);
     ret = neuralNet.softMax(ret);
     return ret;
 }
@@ -44,19 +44,17 @@ int main(){
     std::cout << "opened data\n";
 
     Net model = Net();
-    model.addLayer(784, 64);
-    model.addLayer(64, 32);
-    model.addLayer(32, 16);
-    model.addLayer(16, 16);
-    model.addLayer(16, 10);
+    model.addLayer(784, 128);
+    model.addLayer(128, 64);
+    model.addLayer(64, 10);
 
     model.setLearningRate(learningRate);
 
-    model.printDim(0);
-    model.printDim(1);
-    model.printDim(2);
-    model.printDim(3);
-    model.printDim(4);
+    // model.printDim(0);
+    // model.printDim(1);
+    // model.printDim(2);
+    // model.printDim(3);
+    // model.printDim(4);
     std::cout << "Set initial values\n";
 
     for(int i = 0; i < epoch; i++){
@@ -88,7 +86,7 @@ int main(){
                 index += 1;
                 counter += 1;
 
-                model.printGrad();
+                // model.printGrad();
             }
 
             model.updateWeights();
