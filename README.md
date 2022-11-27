@@ -34,3 +34,37 @@ g++ -O3 -shared -std=c++11  -Wall -fopenmp -fPIC  $(python3 -m pybind11 --includ
 ```
 Once this is done, a Python module is created that can then be imported into an existing Python project.
 
+##Usage
+
+Once the appropriate headers have been added to your C++ soure file, you can instantiate an object of the ```Net``` class.
+```cpp
+Net model = Net();
+```
+
+From there, you can add however many layers you would like to use, specifying the number of inputs and outputs for each layer.
+```cpp
+model.addLayer(784, 128);
+model.addLayer(128, 64);
+model.addLayer(64, 10);
+```
+
+You can set the learning rate that the net will use.
+```cpp
+model.setLearningRate(0.02);
+```
+
+We use OpenMP to accelerate some of the computations being done by doing them in parallel. You can set the number of threads being used as follos.
+
+```cpp
+model.setThreadNum(num_of_threads); 
+```
+
+Once this is done, a variety of functions can be called on the layers of the model, they are as follows:
+```cpp
+model.ff(std::vector<double> vals, int layer_number);
+model.relu(std::vector<double> vals);
+model.leakyRelu(std::vector<double> vals);
+model.Sigmoid(std::vector<double> vals);
+model.softMax(std::vector<double> vals);
+```
+
