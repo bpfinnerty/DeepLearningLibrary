@@ -117,3 +117,192 @@
 --786457-- REDIR: 0x4ca1fa0 (libc.so.6:__GI_strstr) redirected to 0x4843ca0 (__strstr_sse2)
 --786457-- REDIR: 0x491eb80 (libstdc++.so.6:operator new[](unsigned long)) redirected to 0x483c510 (operator new[](unsigned long))
 --786457-- REDIR: 0x4d86530 (libc.so.6:__memchr_avx2) redirected to 0x4840050 (memchr)
+==786457== 
+==786457== Process terminating with default action of signal 2 (SIGINT)
+==786457==    at 0x499F0B3: std::num_get<char, std::istreambuf_iterator<char, std::char_traits<char> > >::do_get(std::istreambuf_iterator<char, std::char_traits<char> >, std::istreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, std::_Ios_Iostate&, double&) const (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x498E312: std::istream& std::istream::_M_extract<double>(double&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x110E91: operator>> (istream:219)
+==786457==    by 0x110E91: shr_using_base_class<double> (converter_lexical_streams.hpp:600)
+==786457==    by 0x110E91: float_types_converter_internal<double> (converter_lexical_streams.hpp:744)
+==786457==    by 0x110E91: float_types_converter_internal<double> (converter_lexical_streams.hpp:742)
+==786457==    by 0x110E91: operator>> (converter_lexical_streams.hpp:770)
+==786457==    by 0x110E91: try_convert (converter_lexical.hpp:485)
+==786457==    by 0x110E91: try_lexical_convert<double, std::__cxx11::basic_string<char> > (try_lexical_convert.hpp:201)
+==786457==    by 0x110E91: lexical_cast<double, std::__cxx11::basic_string<char> > (lexical_cast.hpp:41)
+==786457==    by 0x110E91: data_input::getData(int) (data_input.cpp:95)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== HEAP SUMMARY:
+==786457==     in use at exit: 33,945,295 bytes in 5,380 blocks
+==786457==   total heap usage: 8,562,396 allocs, 8,557,016 frees, 955,159,032 bytes allocated
+==786457== 
+==786457== Searching for pointers to 5,380 not-freed blocks
+==786457== Checked 33,988,552 bytes
+==786457== 
+==786457== 8 bytes in 1 blocks are still reachable in loss record 1 of 14
+==786457==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x4BB124C: ??? (in /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0)
+==786457==    by 0x4BC1BAA: ??? (in /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0)
+==786457==    by 0x4BAF679: ??? (in /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0)
+==786457==    by 0x4011B99: call_init.part.0 (dl-init.c:72)
+==786457==    by 0x4011CA0: call_init (dl-init.c:30)
+==786457==    by 0x4011CA0: _dl_init (dl-init.c:119)
+==786457==    by 0x4001139: ??? (in /usr/lib/x86_64-linux-gnu/ld-2.31.so)
+==786457== 
+==786457== 23 bytes in 1 blocks are still reachable in loss record 2 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x10EAF6: _M_construct<char const*> (basic_string.tcc:219)
+==786457==    by 0x10EAF6: _M_construct_aux<char const*> (basic_string.h:251)
+==786457==    by 0x10EAF6: _M_construct<char const*> (basic_string.h:270)
+==786457==    by 0x10EAF6: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) [clone .isra.0] (basic_string.h:531)
+==786457==    by 0x10D7E7: main (TrainNet.cpp:38)
+==786457== 
+==786457== 24 bytes in 1 blocks are still reachable in loss record 3 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x10EAF6: _M_construct<char const*> (basic_string.tcc:219)
+==786457==    by 0x10EAF6: _M_construct_aux<char const*> (basic_string.h:251)
+==786457==    by 0x10EAF6: _M_construct<char const*> (basic_string.h:270)
+==786457==    by 0x10EAF6: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) [clone .isra.0] (basic_string.h:531)
+==786457==    by 0x10D7D3: main (TrainNet.cpp:37)
+==786457== 
+==786457== 24 bytes in 1 blocks are still reachable in loss record 4 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x10E6E5: _M_construct<char*> (basic_string.tcc:219)
+==786457==    by 0x10E6E5: _M_construct_aux<char*> (basic_string.h:251)
+==786457==    by 0x10E6E5: _M_construct<char*> (basic_string.h:270)
+==786457==    by 0x10E6E5: basic_string (basic_string.h:455)
+==786457==    by 0x10E6E5: data_input (data_input.h:37)
+==786457==    by 0x10E6E5: main (TrainNet.cpp:42)
+==786457== 
+==786457== 57 bytes in 1 blocks are still reachable in loss record 5 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x4962378: std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x4963271: std::string::_Rep::_M_clone(std::allocator<char> const&, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x4963327: std::string::reserve(unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x499F0B2: std::num_get<char, std::istreambuf_iterator<char, std::char_traits<char> > >::do_get(std::istreambuf_iterator<char, std::char_traits<char> >, std::istreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, std::_Ios_Iostate&, double&) const (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x498E312: std::istream& std::istream::_M_extract<double>(double&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x110E91: operator>> (istream:219)
+==786457==    by 0x110E91: shr_using_base_class<double> (converter_lexical_streams.hpp:600)
+==786457==    by 0x110E91: float_types_converter_internal<double> (converter_lexical_streams.hpp:744)
+==786457==    by 0x110E91: float_types_converter_internal<double> (converter_lexical_streams.hpp:742)
+==786457==    by 0x110E91: operator>> (converter_lexical_streams.hpp:770)
+==786457==    by 0x110E91: try_convert (converter_lexical.hpp:485)
+==786457==    by 0x110E91: try_lexical_convert<double, std::__cxx11::basic_string<char> > (try_lexical_convert.hpp:201)
+==786457==    by 0x110E91: lexical_cast<double, std::__cxx11::basic_string<char> > (lexical_cast.hpp:41)
+==786457==    by 0x110E91: data_input::getData(int) (data_input.cpp:95)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 472 bytes in 1 blocks are still reachable in loss record 6 of 14
+==786457==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x4C8492D: __fopen_internal (iofopen.c:65)
+==786457==    by 0x4C8492D: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+==786457==    by 0x4940633: std::__basic_file<char>::open(char const*, std::_Ios_Openmode, int) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x4983F4E: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x1105FE: open (fstream:332)
+==786457==    by 0x1105FE: open (fstream:699)
+==786457==    by 0x1105FE: basic_ifstream (fstream:567)
+==786457==    by 0x1105FE: data_input::getData(int) (data_input.cpp:56)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 2,048 bytes in 1 blocks are still reachable in loss record 7 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x1143B5: allocate (new_allocator.h:114)
+==786457==    by 0x1143B5: allocate (alloc_traits.h:443)
+==786457==    by 0x1143B5: _M_allocate (stl_vector.h:343)
+==786457==    by 0x1143B5: void std::vector<double, std::allocator<double> >::_M_realloc_insert<double const&>(__gnu_cxx::__normal_iterator<double*, std::vector<double, std::allocator<double> > >, double const&) (vector.tcc:440)
+==786457==    by 0x11123C: push_back (stl_vector.h:1195)
+==786457==    by 0x11123C: data_input::getData(int) (data_input.cpp:96)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 4,207 bytes in 1 blocks are still reachable in loss record 8 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x49B735D: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x49B8B52: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x49382FA: std::basic_istream<char, std::char_traits<char> >& std::getline<char, std::char_traits<char>, std::allocator<char> >(std::basic_istream<char, std::char_traits<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, char) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x110722: getline<char, std::char_traits<char>, std::allocator<char> > (basic_string.h:6461)
+==786457==    by 0x110722: data_input::getData(int) (data_input.cpp:70)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 8,192 bytes in 1 blocks are still reachable in loss record 9 of 14
+==786457==    at 0x483C583: operator new[](unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x497FD03: std::basic_filebuf<char, std::char_traits<char> >::_M_allocate_internal_buffer() (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x4983F66: std::basic_filebuf<char, std::char_traits<char> >::open(char const*, std::_Ios_Openmode) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28)
+==786457==    by 0x1105FE: open (fstream:332)
+==786457==    by 0x1105FE: open (fstream:699)
+==786457==    by 0x1105FE: basic_ifstream (fstream:567)
+==786457==    by 0x1105FE: data_input::getData(int) (data_input.cpp:56)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 32,768 bytes in 1 blocks are still reachable in loss record 10 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x114D02: allocate (new_allocator.h:114)
+==786457==    by 0x114D02: allocate (alloc_traits.h:443)
+==786457==    by 0x114D02: _M_allocate (stl_vector.h:343)
+==786457==    by 0x114D02: void std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&) (vector.tcc:440)
+==786457==    by 0x115C0A: emplace_back<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > (vector.tcc:121)
+==786457==    by 0x115C0A: _M_range_initialize<boost::iterators::transform_iterator<boost::algorithm::detail::copy_iterator_rangeF<std::__cxx11::basic_string<char>, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char> > >, boost::algorithm::split_iterator<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char> > >, boost::use_default, boost::use_default> > (stl_vector.h:1561)
+==786457==    by 0x115C0A: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector<boost::iterators::transform_iterator<boost::algorithm::detail::copy_iterator_rangeF<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::algorithm::split_iterator<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::use_default, boost::use_default>, void>(boost::iterators::transform_iterator<boost::algorithm::detail::copy_iterator_rangeF<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::algorithm::split_iterator<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::use_default, boost::use_default>, boost::iterators::transform_iterator<boost::algorithm::detail::copy_iterator_rangeF<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::algorithm::split_iterator<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, boost::use_default, boost::use_default>, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&) (stl_vector.h:654)
+==786457==    by 0x11642A: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >& boost::algorithm::iter_split<std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, boost::algorithm::detail::token_finderF<boost::algorithm::detail::is_any_ofF<char> > >(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, boost::algorithm::detail::token_finderF<boost::algorithm::detail::is_any_ofF<char> >) (iter_find.hpp:186)
+==786457==    by 0x110865: split<std::vector<std::__cxx11::basic_string<char> >, std::__cxx11::basic_string<char>&, boost::algorithm::detail::is_any_ofF<char> > (split.hpp:158)
+==786457==    by 0x110865: data_input::getData(int) (data_input.cpp:73)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 32,768 bytes in 1 blocks are still reachable in loss record 11 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x114255: allocate (new_allocator.h:114)
+==786457==    by 0x114255: allocate (alloc_traits.h:443)
+==786457==    by 0x114255: _M_allocate (stl_vector.h:343)
+==786457==    by 0x114255: void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) (vector.tcc:440)
+==786457==    by 0x111B70: push_back (stl_vector.h:1195)
+==786457==    by 0x111B70: data_input::getData(int) (data_input.cpp:88)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 87,808 bytes in 14 blocks are still reachable in loss record 12 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x113EDE: allocate (new_allocator.h:114)
+==786457==    by 0x113EDE: allocate (alloc_traits.h:443)
+==786457==    by 0x113EDE: _M_allocate (stl_vector.h:343)
+==786457==    by 0x113EDE: _M_create_storage (stl_vector.h:358)
+==786457==    by 0x113EDE: _Vector_base (stl_vector.h:302)
+==786457==    by 0x113EDE: vector (stl_vector.h:552)
+==786457==    by 0x113EDE: construct<std::vector<double>, const std::vector<double, std::allocator<double> >&> (new_allocator.h:146)
+==786457==    by 0x113EDE: construct<std::vector<double>, const std::vector<double, std::allocator<double> >&> (alloc_traits.h:483)
+==786457==    by 0x113EDE: void std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > >::_M_realloc_insert<std::vector<double, std::allocator<double> > const&>(__gnu_cxx::__normal_iterator<std::vector<double, std::allocator<double> >*, std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > > >, std::vector<double, std::allocator<double> > const&) (vector.tcc:449)
+==786457==    by 0x111C7F: push_back (stl_vector.h:1195)
+==786457==    by 0x111C7F: data_input::getData(int) (data_input.cpp:118)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 196,608 bytes in 1 blocks are still reachable in loss record 13 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x113E8A: allocate (new_allocator.h:114)
+==786457==    by 0x113E8A: allocate (alloc_traits.h:443)
+==786457==    by 0x113E8A: _M_allocate (stl_vector.h:343)
+==786457==    by 0x113E8A: void std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > >::_M_realloc_insert<std::vector<double, std::allocator<double> > const&>(__gnu_cxx::__normal_iterator<std::vector<double, std::allocator<double> >*, std::vector<std::vector<double, std::allocator<double> >, std::allocator<std::vector<double, std::allocator<double> > > > >, std::vector<double, std::allocator<double> > const&) (vector.tcc:440)
+==786457==    by 0x111C7F: push_back (stl_vector.h:1195)
+==786457==    by 0x111C7F: data_input::getData(int) (data_input.cpp:118)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== 33,580,288 bytes in 5,354 blocks are still reachable in loss record 14 of 14
+==786457==    at 0x483BE63: operator new(unsigned long) (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==786457==    by 0x11115E: allocate (new_allocator.h:114)
+==786457==    by 0x11115E: allocate (alloc_traits.h:443)
+==786457==    by 0x11115E: _M_allocate (stl_vector.h:343)
+==786457==    by 0x11115E: _M_create_storage (stl_vector.h:358)
+==786457==    by 0x11115E: _Vector_base (stl_vector.h:302)
+==786457==    by 0x11115E: vector (stl_vector.h:552)
+==786457==    by 0x11115E: construct<std::vector<double>, const std::vector<double, std::allocator<double> >&> (new_allocator.h:146)
+==786457==    by 0x11115E: construct<std::vector<double>, const std::vector<double, std::allocator<double> >&> (alloc_traits.h:483)
+==786457==    by 0x11115E: push_back (stl_vector.h:1189)
+==786457==    by 0x11115E: data_input::getData(int) (data_input.cpp:118)
+==786457==    by 0x10D9C7: main (TrainNet.cpp:43)
+==786457== 
+==786457== LEAK SUMMARY:
+==786457==    definitely lost: 0 bytes in 0 blocks
+==786457==    indirectly lost: 0 bytes in 0 blocks
+==786457==      possibly lost: 0 bytes in 0 blocks
+==786457==    still reachable: 33,945,295 bytes in 5,380 blocks
+==786457==                       of which reachable via heuristic:
+==786457==                         stdstring          : 57 bytes in 1 blocks
+==786457==         suppressed: 0 bytes in 0 blocks
+==786457== 
+==786457== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

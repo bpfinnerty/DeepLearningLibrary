@@ -34,8 +34,8 @@ int main(){
     int epoch = 3;
     int batch = 100;
 
-    std::string trainingDataPath = "../data/mnist_train.csv";
-    std::string testingDataPath = "../data/mnist_test.csv";
+    std::string trainingDataPath = "../data/mnist_small.csv";
+    std::string testingDataPath = "../data/mnist_small.csv";
 
     std::cout << "getting to this point.\n";
 
@@ -64,7 +64,7 @@ int main(){
     for(int i = 0; i < epoch; i++){
         std::cout << "epoch: " << i << "\n";
 
-        dataframe shuffled = data.getSample(0.1);
+        dataframe shuffled = data.getSample(1.0);
         std::vector<int> truth = shuffled.getLabels();
         std::vector<std::vector<double>> train = shuffled.getData();
         std::vector<std::vector<double>> encoded_truth = oneHotEncode(truth, 10);
@@ -81,17 +81,17 @@ int main(){
                 if(index >= max_examples){
                     break;
                 }
-                std::cout << "in the while loop\n";
+                //std::cout << "in the while loop\n";
                 std::vector<double> normalized(784,0.0);
                 for(int v = 0; v < 784;++v){
                     normalized[v] = (train[index])[v]/255.0;
                 }
                 model.setInput(normalized);
                 std::vector<double> predictions = forward(normalized, &model);
-                std::cout << "[";
-                for (auto i: predictions)
-                    std::cout << i << ' ';
-                std::cout << "]\n";
+                // std::cout << "[";
+                // for (auto i: predictions)
+                //     std::cout << i << ' ';
+                // std::cout << "]\n";
                 double loss = model.crossEntropy(predictions, encoded_truth[index]);
                 avgLoss += loss;
                 model.backwardStep(predictions, encoded_truth[index]);

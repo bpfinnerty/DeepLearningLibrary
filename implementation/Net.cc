@@ -21,10 +21,16 @@ void Net::setThreadNum(int num){
 }
 
 void Net::setInput(std::vector<double> x){
-    firstInputs.resize(x.size(),0.0);
-    double* fs = firstInputs.data();
-    for(int i = 0;i<(int)x.size();++i){
-        fs[i] = x[i];
+    int s = firstInputs.size();
+    int xSize = x.size();
+    if(s==0){
+        for(int i = 0;i<xSize ;++i){
+            firstInputs.push_back(x[i]);
+        }
+    }else{
+        for(int i = 0;i<xSize ;++i){
+            firstInputs[i] = x[i];
+        }
     }
 }
 
@@ -105,10 +111,10 @@ void Net::setLearningRate(double x){
 }
 
 std::vector<double> Net::relu(std::vector<double> x){
-    std::cout << "Relu Time\n";
+    //std::cout << "Relu Time\n";
     int size = x.size();
-    if(activations.size() != net.size()){
-        std::cout << "addToActivations\n";
+    if((int)activations.size() != (int)(net.size()/layerSize)){
+        // td::cout << "addToActivations\n";
         activations.push_back(&Net::relu);
         activations_deriv.push_back(&Net::relu_deriv);
     }
@@ -123,10 +129,10 @@ std::vector<double> Net::relu(std::vector<double> x){
 }
 
 std::vector<double> Net::leakyRelu(std::vector<double> x){
-    std::cout << "Time for leaky Relu\n";
+    //std::cout << "Time for leaky Relu\n";
     
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        std::cout << "addToActivations\n";
+        //std::cout << "addToActivations\n";
         activations.push_back(&Net::leakyRelu);
         activations_deriv.push_back(&Net::leakyRelu_deriv);
     }
@@ -189,15 +195,15 @@ double Net::crossEntropy(std::vector<double> output,std::vector<double> target){
 }
 
 std::vector<double> Net::softMax(std::vector<double> x){
-    std::cout << "Soft max Time\n";
+    //std::cout << "Soft max Time\n";
     if((int)activations.size() != (int)(net.size()/layerSize)){
         std::cout << "addToActivations\n";
         activations.push_back(&Net::softMax);
         activations_deriv.push_back(&Net::leakyRelu_deriv);
     }
-    std::cout << "hitLimit " << ((int)activations.size() != (int)(net.size()/layerSize)) << "\n";
+    //std::cout << "hitLimit " << ((int)activations.size() != (int)(net.size()/layerSize)) << "\n";
     softBool = true;
-    std::vector<double> ret(x.size(),0.0);
+    std::vector<double> ret((int)x.size(),0.0);
     double total = 0.0;
     int s = x.size();
     for(int i = 0; i<s;++i){
@@ -258,6 +264,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
     double* firstInputLayer = firstInputs.data();
     std::vector<double> errors;
     totalTrain++;
+    int targetSize = target.size();
 
     int layers = net.size()/layerSize;
     for(int curLayer = layers-1; curLayer>=0; --curLayer){
@@ -271,7 +278,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
         double* deltaList = net[curLayer*layerSize+ weightDeltaOffset].data();
 
         if(curLayer == layers-1 && layers-1 != 0){
-            errors.resize(target.size());
+            errors.resize(targetSize);
 
             std::vector<double> act = net[(curLayer-1)*layerSize+ outputOffset];
             std::vector<double> dataList;
@@ -291,7 +298,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
 
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
             if(softBool){
-                std::cout << "usingSoftBool\n";
+                //std::cout << "usingSoftBool\n";
                 dataList = softMax(act);
                 inputList = dataList.data();
                 for(int i = 0; i<numOutputs;++i){
@@ -299,22 +306,21 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
                     errors[i] *= softMax_deriv(nodeOutput,i,numOutputs);
                 }
             }else{
-                std::cout << "Other\n";
                 auto fp = activations[curLayer-1];
-                std::cout << "gotActivation\n";
+               
                 dataList = (this->*fp)(act);
-                std::cout << "applied on list\n";
+               
                 inputList = dataList.data();
-                std::cout << "set Input List\n";
+               
 
-                std::cout << "Applying Activation Deriv\n";
+               
                 auto funcPointer = activations_deriv[curLayer];
                 #pragma omp parallel for num_threads(numOfThreads)
                 for(int i = 0; i<numOutputs;++i){
                     double outputActivation = (this->*funcPointer)(nodeOutput[i]);
                     errors[i] *= outputActivation;
                 }
-                std::cout << "Finished setting errors\n";
+               
             }
 
             #pragma omp parallel for num_threads(numOfThreads)
@@ -357,7 +363,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             auto fp = activations[curLayer-1];
             dataList = (this->*fp)(act);
             inputList = dataList.data();
-            std::cout << "Got activations for this layer\n";
+           
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta PLUM
             auto funcPointer = activations_deriv[curLayer]; 
             #pragma omp parallel for num_threads(numOfThreads)
@@ -378,12 +384,11 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
         std::vector<double> newErrors(numInputs,0.0);
         for(int i = 0; i<numInputs;++i){
             for(int j = 0; j<numOutputs;++j){
-                double temp = errors[j]*weights[i*numOutputs+j];
-                newErrors[i] += temp;
+                newErrors[i] += errors[j]*weights[i*numOutputs+j];
             }
             //std::cout << "New Errors " << i << " " << newErrors[i] << "\n";
-            errors[i] = newErrors[i];
-        }        
+        }
+        errors = newErrors;        
     }  
     firstInputs.clear();
 }
@@ -413,7 +418,7 @@ void Net::printBias(int layer){
 }
 
 void Net::printGrad(){
-    std::cout << "In printGrad\n";
+   
     for(int i = 0; i<(int)net.size()/layerSize;++i){
         std::cout << "\nLayer: " << i << "\n";
         int inputs = sizes[i*2];
@@ -475,9 +480,9 @@ void Net::updateWeights(){
 
 
 std::vector<double> Net::Sigmoid(std::vector<double> x){
-    std::cout << "Sigmoid time\n";
+   
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        std::cout << "addToActivations\n";
+       
         activations.push_back(&Net::Sigmoid);
         activations_deriv.push_back(&Net::sigmoid_deriv);
     }

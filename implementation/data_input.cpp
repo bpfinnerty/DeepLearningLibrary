@@ -57,7 +57,7 @@ dataframe data_input::getData(int col_index_of_label) {
     std::vector<std::vector<double>> dataList;
     std::vector<int> labels;
 
-    std::cout << "processing file: " << fileName << "\n";
+    // std::cout << "processing file: " << fileName << "\n";
 
     std::string line;
     int expectedSizeOfInput = 0;
@@ -66,7 +66,7 @@ dataframe data_input::getData(int col_index_of_label) {
 
 
     // Read file line by line
-    std::cout << "Before entering while loop\n";
+    // std::cout << "Before entering while loop\n";
     while (getline(file, line)){
         std::vector<std::string> vec;
         std::vector<double> vec_data;
