@@ -9,9 +9,6 @@
 #include<fstream>
 #include<boost/algorithm/string.hpp>
 #include<boost/lexical_cast.hpp>
-#include<pybind11/pybind11.h>
-#include<pybind11/numpy.h>
-#include<pybind11/stl.h>
 #include "Net.h"
 
 //namespace Config{
@@ -516,7 +513,6 @@ void Net::readWeightsFromFile(std::string filename){
 
 void Net::printBias(int layer){
     int output = sizes[layer*2+1];
-    
     double* bias = net[layer*layerSize+ biasOffset].data();
     std::cout << "[";
     for(int i = 0; i< output;++i){
