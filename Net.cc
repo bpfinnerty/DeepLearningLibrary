@@ -5,6 +5,10 @@
 #include<vector>
 #include<math.h>
 #include<stdexcept>
+#include<iostream>
+#include<fstream>
+#include<boost/algorithm/string.hpp>
+#include<boost/lexical_cast.hpp>
 //#include<pybind11/pybind11.h>
 //#include<pybind11/numpy.h>
 //#include<pybind11/stl.h>
@@ -383,6 +387,110 @@ void Net::printWeights(int layer){
         std::cout << weights[i] << " ,";
     }
     std::cout << "]\n";
+}
+
+void Net::writeWeightsToFile(){
+    int num_of_layers = net.size()/layerSize;
+
+    std::ofstream file;
+    file.open("net_weights_bias.txt", std::ios_base::out);
+
+    // Iterate over number of layers 
+    for(int i = 0; i < num_of_layers; i++){
+        // for each layer, grab size of input and output
+        int input = sizes[i * 2];
+        int output = sizes[i * 2 + 1];
+
+        // retrieve the weights and bias for each layer
+        double* weights = net[i * layerSize + weightsOffset].data();
+        double* bias = net[i * layerSize + biasOffset].data();
+
+        // add a line that contains the layer number, input and output
+        file << i << "," << input << "," << output << "\n";
+
+        // on the next line, add all of the weights to the file
+        for(int j = 0; j < input * output; j++){
+            file << weights[j];
+            if(j + 1 != input * output){
+                file << ",";
+            }
+        }
+        file << "\n";
+
+        // on the next line, add all of the bias to the file
+        for(int j = 0; j < output; j++){
+            file << bias[j];
+            if(j + 1 != output){
+                file << ",";
+            }
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
+void Net::readWeightsFromFile(std::string filename){
+    std::ifstream file(filename);
+    std::string line;
+
+    int layer = -1;
+    int input = 0;
+    int output = 0;
+    bool weightsProcessed = false;
+    bool biasProcessed = false;
+
+    while(getline(file, line)){
+        std::vector<std::string> vec;
+        boost::algorithm::split(vec, line, boost::is_any_of(","));
+
+        if(layer == -1 && input == 0 && output == 0){
+            try{
+                //std::cout << vec.at(0) << " " << vec.at(1) << " " << vec.at(2) << "\n";
+                layer = boost::lexical_cast<int>(vec.at(0));
+                input = boost::lexical_cast<int>(vec.at(1));
+                output = boost::lexical_cast<int>(vec.at(2));
+            }catch(boost::bad_lexical_cast &e){
+                std::cout << "Could not parse layer number and layer input and output sizes\n";
+                layer = -1;
+                input = 0;
+                output = 0;
+                continue;
+            }
+        }else{
+            if(!weightsProcessed){
+                double* weights = net[layer * layerSize + weightsOffset].data();
+                for(int i = 0; i < vec.size(); i++){
+                    try{
+                        double val = boost::lexical_cast<double>(vec.at(i));
+                        weights[i] = val;
+                    }catch(boost::bad_lexical_cast &e){
+                        std::cout << " unable to parse value from file, filling with zero\n";
+                    }
+                }
+                weightsProcessed = true;
+                continue;
+            }
+            if(!biasProcessed){
+                double* bias = net[layer * layerSize + biasOffset].data();
+                for(int i = 0; i < vec.size(); i++){
+                    try{
+                        double val = boost::lexical_cast<double>(vec.at(i));
+                        bias[i] = val;
+                    }catch(boost::bad_lexical_cast &e){
+                        std::cout << " unable to parse value from file, filling with zero\n";
+                    }
+                }
+                layer = -1;
+                input = 0;
+                output = 0;
+                weightsProcessed = false;
+                biasProcessed = false;
+                continue;
+            }
+        }
+    }
+    file.close();
 }
 
 void Net::printBias(int layer){
