@@ -5,15 +5,19 @@
 #include<vector>
 #include<math.h>
 #include<stdexcept>
-#include<pybind11/pybind11.h>
-#include<pybind11/numpy.h>
-#include<pybind11/stl.h>
+//#include<pybind11/pybind11.h>
+//#include<pybind11/numpy.h>
+//#include<pybind11/stl.h>
 #include "Net.h"
 
-namespace Config{
-    void setThreads(int t){
-        numThreads = t;
-    }
+//namespace Config{
+//    void setThreads(int t){
+//        numThreads = t;
+//    }
+//}
+
+void Net::setThreadNum(int num){
+    numOfThreads = num;
 }
 
 void Net::setInput(std::vector<double> x){
@@ -108,7 +112,7 @@ std::vector<double> Net::relu(std::vector<double> x){
     }
     std::vector<double> ret(size);
     
-    #pragma omp parallel for num_threads(Config::numThreads)
+    #pragma omp parallel for num_threads(numOfThreads)
     for(int i = 0; i<size;++i){
         ret[i] = x[i] > 0 ? x[i] : 0;
     }
@@ -126,7 +130,7 @@ std::vector<double> Net::leakyRelu(std::vector<double> x){
     int size = x.size();
     std::vector<double> ret(size);
     
-    #pragma omp parallel for num_threads(Config::numThreads)
+    #pragma omp parallel for num_threads(numOfThreads)
     for(int i = 0; i<size;++i){
         ret[i] = x[i] > 0 ? x[i] : x[i]*0.01;
     }
@@ -200,7 +204,7 @@ std::vector<double> Net::softMax(std::vector<double> x){
 
 double Net::softMax_deriv(double* x, int focus, int outputLen){
     double ret = 0.0;
-    #pragma omp parallel for num_threads(Config::numThreads)
+    #pragma omp parallel for num_threads(numOfThreads)
     for(int i = 0; i<outputLen;++i){
         if(i == focus){
             ret += x[focus] * (1-x[focus]);
@@ -267,7 +271,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             
             // get errors output node
             if(meanLoss){
-                #pragma omp parallel for num_threads(Config::numThreads)
+                #pragma omp parallel for num_threads(numOfThreads)
                 for(int i = 0; i <numOutputs; ++i){
                     errors[i]=output[i]-target[i];
                 }
@@ -292,14 +296,14 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
 
 
                 auto funcPointer = activations_deriv[curLayer];
-                #pragma omp parallel for num_threads(Config::numThreads)
+                #pragma omp parallel for num_threads(numOfThreads)
                 for(int i = 0; i<numOutputs;++i){
                     double outputActivation = (this->*funcPointer)(nodeOutput[i]);
                     errors[i] *= outputActivation;
                 }
             }
 
-            #pragma omp parallel for num_threads(Config::numThreads)
+            #pragma omp parallel for num_threads(numOfThreads)
             for(int i = 0; i<numOutputs; ++i){
                 // get gradient for delta term.
                 deltaBias[i] += errors[i];
@@ -316,7 +320,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta
             auto funcPointer = activations_deriv[curLayer];
-            #pragma omp parallel for num_threads(Config::numThreads)
+            #pragma omp parallel for num_threads(numOfThreads)
             for(int i = 0; i<numOutputs; ++i){
                 // error * derivative of activation
                 double deriv_temp = (this->*funcPointer)(nodeOutput[i]);
@@ -341,7 +345,7 @@ void Net::backwardStep(std::vector<double> output,std::vector<double> target){
             inputList = dataList.data();
             // in order to update, still need deriv of activation and previous input. That will give delta. w = w - learning rate*delta PLUM
             auto funcPointer = activations_deriv[curLayer]; 
-            #pragma omp parallel for num_threads(Config::numThreads)
+            #pragma omp parallel for num_threads(numOfThreads)
             for(int i = 0; i<numOutputs; ++i){
                 // error * derivative of activation
                 errors[i] *= (this->*funcPointer)(nodeOutput[i]);
@@ -433,7 +437,7 @@ void Net::updateWeights(){
         double* deltaBias =net[currLayer*layerSize+ biasDeltaOffset].data();
         double* deltaList = net[currLayer*layerSize+ weightDeltaOffset].data();
         
-        #pragma omp parallel for num_threads(Config::numThreads)
+        #pragma omp parallel for num_threads(numOfThreads)
         for(int j = 0; j < numOutputs; ++j){
             double biasTemp = deltaBias[j];
             biasTemp = biasTemp >= gradMaxThreshold ? gradMaxThreshold : biasTemp;
@@ -461,7 +465,7 @@ std::vector<double> Net::Sigmoid(std::vector<double> x){
     }
     std::vector<double> ret(x.size(),0.0);
     
-    #pragma omp parallel for num_threads(Config::numThreads)
+    #pragma omp parallel for num_threads(numOfThreads)
     for(int i =0; i<(int)x.size();++i){
         ret[i] = (1.0)/(1.0+exp(-x[i]));
 
@@ -527,14 +531,14 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
     
 
     //std::cout << "Set Bias\n";
-    #pragma omp parallel for num_threads(Config::numThreads)
+    #pragma omp parallel for num_threads(numOfThreads)
     for(int j = 0; j<outputs;++j){
         ret[j] = bias[j];
     }
 
     double sum = 0.0;
     //std::cout << "multiply by weights\n";
-    #pragma omp parallel for num_threads(Config::numThreads) private(sum)
+    #pragma omp parallel for num_threads(numOfThreads) private(sum)
     for(int i = 0; i < outputs; ++i){
        //std::cout << "Starting Node " << i << "\n";
        sum = ret[i];
@@ -555,36 +559,36 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
 
 
 
-namespace py = pybind11;
+//namespace py = pybind11;
 
-PYBIND11_MODULE(projNet,m){  
-  py::class_<Net>(m,"Net")
-    .def(py::init<>())
-    .def("setInput",&Net::setInput)
-    .def("ff",&Net::ff)
-    .def("addLayer",&Net::addLayer)
-    .def("setLearningRate",&Net::setLearningRate)
-    .def("relu",&Net::relu)
-    .def("backwardStep",&Net::backwardStep)
-    .def("leakyRelu",&Net::leakyRelu)
-    .def("updateWeights",&Net::updateWeights)
-    .def("crossEntropy",&Net::crossEntropy)
-    .def("zeroGrad",&Net::zeroGrad)
-    .def("softMax",&Net::softMax)
-    .def("printWeights",&Net::printWeights)
-    .def("Sigmoid",&Net::Sigmoid)
-    .def("printBias",&Net::printBias)
-    .def("setWeights",&Net::setWeights)
-    .def("setBias",&Net::setBias)
-    .def("printGrad",&Net::printGrad)
-    .def("printBiasGrad",&Net::printBiasGrad)
-    .def("msLoss",&Net::msLoss)
-    .def("printDim",&Net::printDim);
+//PYBIND11_MODULE(projNet,m){  
+//  py::class_<Net>(m,"Net")
+//    .def(py::init<>())
+//    .def("setInput",&Net::setInput)
+//    .def("ff",&Net::ff)
+//    .def("addLayer",&Net::addLayer)
+//    .def("setLearningRate",&Net::setLearningRate)
+//    .def("relu",&Net::relu)
+//    .def("backwardStep",&Net::backwardStep)
+//    .def("leakyRelu",&Net::leakyRelu)
+//    .def("updateWeights",&Net::updateWeights)
+//    .def("crossEntropy",&Net::crossEntropy)
+//    .def("zeroGrad",&Net::zeroGrad)
+//    .def("softMax",&Net::softMax)
+//    .def("printWeights",&Net::printWeights)
+//    .def("Sigmoid",&Net::Sigmoid)
+//   .def("printBias",&Net::printBias)
+//    .def("setWeights",&Net::setWeights)
+//    .def("setBias",&Net::setBias)
+//    .def("printGrad",&Net::printGrad)
+//    .def("printBiasGrad",&Net::printBiasGrad)
+//    .def("msLoss",&Net::msLoss)
+//   .def("printDim",&Net::printDim);
     
 
-  m.def("setThreads",&Config::setThreads);
+//  m.def("setThreads",&Config::setThreads);
   
-}
+//}
 
 
 

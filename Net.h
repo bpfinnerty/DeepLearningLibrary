@@ -12,10 +12,10 @@
 #include <random>
 
 
-namespace Config{
-    int numThreads = 1;
-    void setThreads(int t);
-}
+//namespace Config{
+//    int numThreads = 1;
+//    void setThreads(int t);
+//}
 
 class Net{
     
@@ -42,6 +42,8 @@ class Net{
         //     deltaBias.resize(outputs,0.0);
         // }
 
+        void setThreadNum(int num);
+
         void setInput(std::vector<double> x);
         void normal_distribution_weights(double* weights, double* bias, int inputs, int outputs);
         void setWeights(std::vector<double> startWeights, int layer);
@@ -61,6 +63,7 @@ class Net{
         int outputOffset = 2;
         int weightDeltaOffset = 3;
         int biasDeltaOffset = 4;
+        int numOfThreads = 1;
         std::vector<double> firstInputs;
         
         std::vector<int> sizes;
