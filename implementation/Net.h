@@ -111,8 +111,8 @@ class Net{
         bool softBool = false;
         bool meanLoss = false;
         int totalTrain = 0;
-        double gradMaxThreshold = .1;
-        double gradMinThreshold = -.1;
+        double gradMaxThreshold = 10;
+        double gradMinThreshold = -10;
 
         Net(){
 

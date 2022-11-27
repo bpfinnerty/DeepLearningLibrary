@@ -9,9 +9,9 @@
 #include<fstream>
 #include<boost/algorithm/string.hpp>
 #include<boost/lexical_cast.hpp>
-//#include<pybind11/pybind11.h>
-//#include<pybind11/numpy.h>
-//#include<pybind11/stl.h>
+// #include<pybind11/pybind11.h>
+// #include<pybind11/numpy.h>
+// #include<pybind11/stl.h>
 #include "Net.h"
 
 //namespace Config{
@@ -201,7 +201,7 @@ double Net::crossEntropy(std::vector<double> output,std::vector<double> target){
 std::vector<double> Net::softMax(std::vector<double> x){
     //std::cout << "Soft max Time\n";
     if((int)activations.size() != (int)(net.size()/layerSize)){
-        std::cout << "addToActivations\n";
+        // std::cout << "addToActivations\n";
         activations.push_back(&Net::softMax);
         activations_deriv.push_back(&Net::leakyRelu_deriv);
     }
@@ -481,7 +481,7 @@ void Net::readWeightsFromFile(std::string filename){
         }else{
             if(!weightsProcessed){
                 double* weights = net[layer * layerSize + weightsOffset].data();
-                for(int i = 0; i < vec.size(); i++){
+                for(int i = 0; i < (int)vec.size(); i++){
                     try{
                         double val = boost::lexical_cast<double>(vec.at(i));
                         weights[i] = val;
@@ -494,7 +494,7 @@ void Net::readWeightsFromFile(std::string filename){
             }
             if(!biasProcessed){
                 double* bias = net[layer * layerSize + biasOffset].data();
-                for(int i = 0; i < vec.size(); i++){
+                for(int i = 0; i < (int)vec.size(); i++){
                     try{
                         double val = boost::lexical_cast<double>(vec.at(i));
                         bias[i] = val;
@@ -612,25 +612,22 @@ double Net::sigmoid_deriv(double x){
 
 // Methods for Layer Class
 void Net::normal_distribution_weights(double* weights, double* bias, int inputs, int outputs){
+    int size = inputs*outputs;
+    double stdv = 1/sqrt(outputs);
     std::random_device rd{};
     std::mt19937 gen{rd()};
-    std::normal_distribution<double> distribution(.05,1.0);
+    std::normal_distribution<double> distribution(stdv,stdv);
     int i = 0;
-    int size = inputs*outputs;
+    
     while(i< size){
-        double w = distribution(gen)/10;
-        if (w >= 0.0 && w <=1.0){
-            weights[i] = w;
-            i++;
-        }
+        double w = distribution(gen)/1;
+        weights[i] = w;
+        i++;
     }
     int j =0;
     while(j < outputs){
-        double w = distribution(gen);
-        if (w >= 0.0 && w <=1.0){
-            bias[j] = w;
-            j++;
-        }
+        bias[j] = 0.0;
+        j++;
     }
     //std::f << "Initialized Weights";
 }
@@ -687,9 +684,9 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
 
 
 
-//namespace py = pybind11;
+// namespace py = pybind11;
 
-//PYBIND11_MODULE(projNet,m){  
+// PYBIND11_MODULE(projNet,m){  
 //  py::class_<Net>(m,"Net")
 //    .def(py::init<>())
 //    .def("setInput",&Net::setInput)
@@ -711,12 +708,9 @@ std::vector<double> Net::ff(std::vector<double> x, int layer){
 //    .def("printGrad",&Net::printGrad)
 //    .def("printBiasGrad",&Net::printBiasGrad)
 //    .def("msLoss",&Net::msLoss)
+//    .def("setThreadNum",&Net::setThreadNum)
 //   .def("printDim",&Net::printDim);
-    
-
-//  m.def("setThreads",&Config::setThreads);
-  
-//}
+// }
 
 
 

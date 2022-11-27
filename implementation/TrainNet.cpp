@@ -29,13 +29,13 @@ std::vector<std::vector<double>> oneHotEncode(std::vector<int> labels, int num_o
 
 int main(){
     std::cout << "start of Main\n";
-    float learningRate = 0.04;
-    int numThreads = 1;
-    int epoch = 3;
-    int batch = 100;
+    float learningRate = 0.002;
+    int numThreads = 8;
+    int epoch = 50;
+    int batch = 200;
 
-    std::string trainingDataPath = "../data/mnist_small.csv";
-    std::string testingDataPath = "../data/mnist_small.csv";
+    std::string trainingDataPath = "../data/mnist_train.csv";
+    std::string testingDataPath = "../data/mnist_test.csv";
 
     std::cout << "getting to this point.\n";
 
@@ -51,6 +51,9 @@ int main(){
     model.addLayer(128, 64);
     model.addLayer(64, 10);
 
+    //model.printWeights(1);
+    //std::cout << "created Net\n";
+
     model.setLearningRate(learningRate);
     model.setThreadNum(numThreads);
 
@@ -64,16 +67,17 @@ int main(){
     for(int i = 0; i < epoch; i++){
         std::cout << "epoch: " << i << "\n";
 
-        dataframe shuffled = data.getSample(1.0);
-        std::vector<int> truth = shuffled.getLabels();
-        std::vector<std::vector<double>> train = shuffled.getData();
+        // dataframe shuffled = data.getSample(1.0);
+        std::vector<int> truth = data.getLabels();
+        std::vector<std::vector<double>> train = data.getData();
         std::vector<std::vector<double>> encoded_truth = oneHotEncode(truth, 10);
-
-        int max_examples = (int)encoded_truth.size();
+        std::cout << "dataRetrieved\n";
+        int max_examples = train.size();
         int index = 0;
         double avgLoss = 0;
 
         while(index < max_examples){
+            // std::cout << "Index: " << index << "\n";
             model.zeroGrad();
             int counter = 0;
 
@@ -81,7 +85,6 @@ int main(){
                 if(index >= max_examples){
                     break;
                 }
-                //std::cout << "in the while loop\n";
                 std::vector<double> normalized(784,0.0);
                 for(int v = 0; v < 784;++v){
                     normalized[v] = (train[index])[v]/255.0;
@@ -94,13 +97,14 @@ int main(){
                 // std::cout << "]\n";
                 double loss = model.crossEntropy(predictions, encoded_truth[index]);
                 avgLoss += loss;
+                //std::cout << "Loss: " << loss << " for epoch: " << i << "\n";
                 model.backwardStep(predictions, encoded_truth[index]);
                 index += 1;
                 counter += 1;
 
-                // model.printGrad();
+                
             }
-
+            
             model.updateWeights();
         }
         std::cout << "Avg Loss: " << avgLoss/max_examples << " for epoch: " << i << "\n";

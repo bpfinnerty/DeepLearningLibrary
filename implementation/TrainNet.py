@@ -17,7 +17,7 @@ def testAccuracy(model, test_df):
     # print("convert to numpy")
     truth_subset = test_df.iloc[:,0].to_numpy()
     # print(truth_subset)
-    test_subset = test_df.iloc[:,1:].to_numpy()
+    test_subset = test_df.iloc[:,1:].to_numpy()/255
     print(test_subset.shape)
     
     # print("Get shape")
@@ -50,13 +50,13 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     #print("opened data")
     
     model.neuralNet.setLearningRate(learningRate)
-    projNet.setThreads(numThreads)
+    model.neuralNet.setThreadNum(numThreads)
 
     #print("Set initial values")
     
     for e in range(0,epoch):
         print("epoch: " + str(e))
-        train_df = df.sample(frac=.5)
+        train_df = df.sample(frac=.8)
         test_df = t_df.sample(frac=.2)
         
         # print("\nDimensions\n")
@@ -71,7 +71,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
         
         
         truth_subset = train_df.iloc[:,0].to_numpy()
-        train_subset = train_df.iloc[:,1:].to_numpy()
+        train_subset = train_df.iloc[:,1:].to_numpy()/255
         encoded_truth = oneHotEncode(truth_subset,10)
         
         
@@ -127,13 +127,13 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
 if __name__ == "__main__":
     
-    learningRate = 0.02
-    numThreads = 12
-    epoch = 300
-    batch = 8
+    learningRate = 0.04
+    numThreads = 8
+    epoch = 5
+    batch = 100
     
-    trainingDataPath = "mnist_train.csv"
-    testingDataPath = "mnist_test.csv"
+    trainingDataPath = "../data/mnist_train.csv"
+    testingDataPath = "../data/mnist_test.csv"
     
     model = modelMLP()
     
