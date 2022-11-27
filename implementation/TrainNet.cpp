@@ -28,23 +28,23 @@ std::vector<std::vector<double>> oneHotEncode(std::vector<int> labels, int num_o
 }
 
 int main(){
-    std::cout << "start of Main\n";
+
     float learningRate = 0.002;
     int numThreads = 8;
-    int epoch = 10;
+    int epoch = 30;
     int batch = 200;
 
     std::string trainingDataPath = "../data/mnist_train.csv";
     std::string testingDataPath = "../data/mnist_test.csv";
 
-    std::cout << "getting to this point.\n";
+
 
     data_input dataReader = data_input(trainingDataPath, ",");
     dataframe data = dataReader.getData(0);
 
     // test_data_input test_dataReader = data_input(testingDataPath, ",");
     // test_dataframe test_data = test_dataReader.getData(0);
-    std::cout << "opened data\n";
+
 
     Net model = Net();
     model.addLayer(784, 128);
@@ -62,7 +62,7 @@ int main(){
     // model.printDim(2);
     // model.printDim(3);
     // model.printDim(4);
-    std::cout << "Set initial values\n";
+
 
     for(int i = 0; i < epoch; i++){
         std::cout << "epoch: " << i << "\n";
@@ -71,7 +71,7 @@ int main(){
         std::vector<int> truth = data.getLabels();
         std::vector<std::vector<double>> train = data.getData();
         std::vector<std::vector<double>> encoded_truth = oneHotEncode(truth, 10);
-        std::cout << "dataRetrieved\n";
+        
         int max_examples = train.size();
         int index = 0;
         double avgLoss = 0;
@@ -91,18 +91,11 @@ int main(){
                 }
                 model.setInput(normalized);
                 std::vector<double> predictions = forward(normalized, &model);
-                // std::cout << "[";
-                // for (auto i: predictions)
-                //     std::cout << i << ' ';
-                // std::cout << "]\n";
                 double loss = model.crossEntropy(predictions, encoded_truth[index]);
                 avgLoss += loss;
-                //std::cout << "Loss: " << loss << " for epoch: " << i << "\n";
                 model.backwardStep(predictions, encoded_truth[index]);
                 index += 1;
-                counter += 1;
-
-                
+                counter += 1;        
             }
             
             model.updateWeights();
