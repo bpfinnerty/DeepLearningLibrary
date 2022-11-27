@@ -19,7 +19,7 @@ class dataframe{
 
         std::vector<int> getLabels(){return labels;}
 
-        dataframe(std::vector<std::vector<double>> data, std::vector<int>) : data(data), labels(labels){}
+        dataframe(std::vector<std::vector<double>> data, std::vector<int> labels) : data(data), labels(labels){}
 };
 
 class data_input{

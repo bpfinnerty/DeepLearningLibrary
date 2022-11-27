@@ -26,10 +26,13 @@ dataframe dataframe::getSample(double frac){
     }
 
     dataframe ret(sample_data, sample_labels);
+
+    return ret;
 }
 
 bool data_input::isInteger(std::string const &str){
     try {
+        //std::cout << "in isInteger func, string being processed is: " << str << "\n";
         boost::lexical_cast<int>(str);
         return true;
     }
@@ -54,45 +57,52 @@ dataframe data_input::getData(int col_index_of_label) {
     std::vector<std::vector<double>> dataList;
     std::vector<int> labels;
 
+    std::cout << "processing file: " << fileName << "\n";
+
     std::string line;
     int expectedSizeOfInput = 0;
     bool foundSizeOfInput = false;
+    bool skipheader = false;
+
 
     // Read file line by line
+    std::cout << "Before entering while loop\n";
     while (getline(file, line)){
         std::vector<std::string> vec;
         std::vector<double> vec_data;
         boost::algorithm::split(vec, line, boost::is_any_of(delimeter));
 
         // Skip the first line if it does not contain a number, as this is most likely the header info
-        if(!data_input::isInteger(vec.at(0))){
+        if(skipheader == false){
+            skipheader = true;
             continue;
         }
 
         // go through the parsed vector to convert from strings to numbers
         for(int i = 0; i < vec.size(); i++){
+            //std::cout << vec.at(i) << " ";
             if(i == col_index_of_label){
                 // if we reach the index that contains the label information, place in label vector
-
                 if(isInteger(vec.at(i))){
                     int label = boost::lexical_cast<int>(vec.at(i));
                     labels.push_back(label);
                 }else {
-                    std::cout << "got invalid data\n";
+                    std::cout << "got invalid label data\n";
                     exit(0);
                 }
             }else{
-                // else we just convert string to a double
-
                 if(isDouble(vec.at(i))){
                     double val = boost::lexical_cast<double>(vec.at(i));
                     vec_data.push_back(val);
                 }else{
-                    std::cout << "got invalid data\n";
-                    exit(0);
+                    //std::cout << "got invalid data: " << vec.at(i) << ", replacing with zero \n ";
+                    double val = 0.0;
+                    vec_data.push_back(val);
+                    //exit(0);
                 }
             }
         }
+        //std::cout << "\n";
 
         if(!foundSizeOfInput){
             // Check to see what the expected size of the input should be and store that for later checks
