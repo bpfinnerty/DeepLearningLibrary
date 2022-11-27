@@ -1,5 +1,8 @@
 #include "Net.h"
 #include "data_input.h"
+#include <vector>
+#include <cstdlib>
+
 
 std::vector<double> forward(std::vector<double> val, Net neuralNet){
     std::vector<double> ret = neuralNet.ff(val, 0);
@@ -7,6 +10,10 @@ std::vector<double> forward(std::vector<double> val, Net neuralNet){
     ret = neuralNet.ff(ret, 1);
     ret = neuralNet.Sigmoid(ret);
     ret = neuralNet.ff(ret, 2);
+    ret = neuralNet.Sigmoid(ret);
+    ret = neuralNet.ff(ret, 3);
+    ret = neuralNet.Sigmoid(ret);
+    ret = neuralNet.ff(ret, 4);
     ret = neuralNet.softMax(ret);
     return ret;
 }
@@ -21,22 +28,27 @@ std::vector<std::vector<double>> oneHotEncode(std::vector<int> labels, int num_o
 }
 
 int main(){
-    float learningRate = 0.01;
+    std::cout << "start of Main\n";
+    float learningRate = 0.02;
     int numThreads = 1;
-    int epoch = 30;
-    int batch = 16;
+    int epoch = 300;
+    int batch = 8;
 
     std::string trainingDataPath = "mnist_train.csv";
-    std::string testingDataPath = "mnist_train.csv";
+    std::string testingDataPath = "winequality-red.csv";
+
+    std::cout << "getting to this point.\n";
 
     data_input dataReader = data_input(trainingDataPath, ",");
     dataframe data = dataReader.getData(0);
     std::cout << "opened data\n";
 
     Net model = Net();
-    model.addLayer(784, 256);
-    model.addLayer(256, 64);
-    model.addLayer(64, 10);
+    model.addLayer(784, 64);
+    model.addLayer(64, 32);
+    model.addLayer(32, 16);
+    model.addLayer(16, 16);
+    model.addLayer(16, 10);
 
     model.setLearningRate(learningRate);
 
@@ -67,6 +79,7 @@ int main(){
                 if(index >= max_examples){
                     break;
                 }
+                std::cout << "in the while loop";
 
                 std::vector<double> predictions = forward(train[index], model);
                 double loss = model.crossEntropy(predictions, encoded_truth[index]);
@@ -82,4 +95,6 @@ int main(){
         }
         std::cout << "Avg Loss: " << avgLoss/max_examples << " for epoch: " << i << "\n";
     }
+
+    return 0;
 }
