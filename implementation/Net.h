@@ -104,6 +104,9 @@ class Net{
         void printWeights(int layer);
         void printDim(int layer);
 
+        void writeWeightsToFile();
+        void readWeightsFromFile(std::string filename);
+
         bool gpu_check = false;
         bool softBool = false;
         bool meanLoss = false;
