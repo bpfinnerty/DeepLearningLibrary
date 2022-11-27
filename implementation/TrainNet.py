@@ -42,7 +42,7 @@ def testAccuracy(model, test_df):
 
 def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath, model):
     
-    df = pd.read_csv(trainDataPath,header=None,skiprows=1)
+    train_df = pd.read_csv(trainDataPath,header=None,skiprows=1)
     t_df = pd.read_csv(testDataPath,header=None,skiprows=1)
     # print(df)
    
@@ -56,8 +56,8 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
     
     for e in range(0,epoch):
         print("epoch: " + str(e))
-        train_df = df.sample(frac=.8)
-        test_df = t_df.sample(frac=.2)
+        #train_df = df.sample(frac=1)
+        #test_df = t_df.sample(frac=.2)
         
         # print("\nDimensions\n")
         
@@ -115,7 +115,7 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
             #print("finished batch")
             model.neuralNet.updateWeights()
         print("Avg Loss: " + str(avgLoss/max_examples) + " for epoch: " + str(e))
-        testAccuracy(model,test_df)
+        #testAccuracy(model,test_df)
     print("finished")
     exit(1)
             
@@ -127,10 +127,10 @@ def main(learningRate, numThreads, epoch, batch_size, trainDataPath,testDataPath
 
 if __name__ == "__main__":
     
-    learningRate = 0.04
+    learningRate = 0.002
     numThreads = 8
-    epoch = 5
-    batch = 100
+    epoch = 50
+    batch = 200
     
     trainingDataPath = "../data/mnist_train.csv"
     testingDataPath = "../data/mnist_test.csv"

@@ -31,7 +31,7 @@ int main(){
     std::cout << "start of Main\n";
     float learningRate = 0.002;
     int numThreads = 8;
-    int epoch = 50;
+    int epoch = 10;
     int batch = 200;
 
     std::string trainingDataPath = "../data/mnist_train.csv";
