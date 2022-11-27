@@ -6,8 +6,8 @@
 #include "data_input.h"
 #include <cmath>
 #include <random>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
+#include <../boost/algorithm/string.hpp>
+#include <../boost/lexical_cast.hpp>
 
 dataframe dataframe::getSample(double frac){
     std::vector<std::vector<double>> sample_data;
@@ -79,7 +79,7 @@ dataframe data_input::getData(int col_index_of_label) {
         }
 
         // go through the parsed vector to convert from strings to numbers
-        for(int i = 0; i < vec.size(); i++){
+        for(int i = 0; i < (int)vec.size(); i++){
             //std::cout << vec.at(i) << " ";
             if(i == col_index_of_label){
                 // if we reach the index that contains the label information, place in label vector
@@ -110,7 +110,7 @@ dataframe data_input::getData(int col_index_of_label) {
             foundSizeOfInput = true;
         }else{
             // If the next line does not have the expected number of inputs,
-            if(vec.size() != expectedSizeOfInput){
+            if((int)vec.size() != expectedSizeOfInput){
                 std::cout << "Error: expected data input size of " << expectedSizeOfInput << ", got " << vec.size();
                 exit(0);
             }
