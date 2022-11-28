@@ -13,7 +13,7 @@ class dataframe{
         std::vector<std::vector<double>> data;
         std::vector<int> labels;
 
-        dataframe getSample(double frac);
+        // dataframe getSample(double frac);
 
         std::vector<std::vector<double>> getData(){return data;}
 

@@ -9,26 +9,26 @@
 #include <../boost/algorithm/string.hpp>
 #include <../boost/lexical_cast.hpp>
 
-dataframe dataframe::getSample(double frac){
-    std::vector<std::vector<double>> sample_data;
-    std::vector<int> sample_labels;
-    int num_of_entries = data.size();
-    int num_of_samples = std::ceil(num_of_entries * frac);
+// dataframe dataframe::getSample(double frac){
+//     std::vector<std::vector<double>> sample_data;
+//     std::vector<int> sample_labels;
+//     int num_of_entries = data.size();
+//     int num_of_samples = std::ceil(num_of_entries * frac);
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distr(0, num_of_entries);
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     std::uniform_int_distribution<> distr(0, num_of_entries);
 
-    for(int i = 0; i < num_of_samples; i++){
-        auto index = distr(gen);
-        sample_data.push_back(data[index]);
-        sample_labels.push_back(labels[index]);
-    }
+//     for(int i = 0; i < num_of_samples; i++){
+//         auto index = distr(gen);
+//         sample_data.push_back(data[index]);
+//         sample_labels.push_back(labels[index]);
+//     }
 
-    dataframe ret(sample_data, sample_labels);
+//     dataframe ret(sample_data, sample_labels);
 
-    return ret;
-}
+//     return ret;
+// }
 
 bool data_input::isInteger(std::string const &str){
     try {
