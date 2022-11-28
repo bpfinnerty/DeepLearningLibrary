@@ -117,8 +117,6 @@ Net::updateWeights();
 Net::Sigmoid(std::vector<double> x);
 Net::ff(std::vector<double> x, int layer);
 data_input::getData(int col_index_of_label);
-
-
-
+data_input::getLabels();
 ```
 
